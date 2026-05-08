@@ -1,0 +1,91 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 400" width="400" height="400">
+  <defs>
+    <radialGradient id="bg-grad" cx="50%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#1c318f"/>
+      <stop offset="55%" stop-color="#0f1e72"/>
+      <stop offset="100%" stop-color="#08114a"/>
+    </radialGradient>
+    <radialGradient id="center-glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="rgba(212,175,55,0.08)"/>
+      <stop offset="100%" stop-color="rgba(212,175,55,0)"/>
+    </radialGradient>
+    <filter id="text-shadow" x="-5%" y="-5%" width="110%" height="115%">
+      <feDropShadow dx="2" dy="3" stdDeviation="4" flood-color="rgba(0,0,0,0.5)"/>
+    </filter>
+    <filter id="gold-glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="400" height="400" rx="22" fill="url(#bg-grad)"/>
+  <!-- Center glow overlay -->
+  <rect width="400" height="400" rx="22" fill="url(#center-glow)"/>
+  <!-- Gold outer border -->
+  <rect x="1.5" y="1.5" width="397" height="397" rx="21" fill="none" stroke="#D4AF37" stroke-width="2" opacity="0.55"/>
+  <!-- Inner highlight line -->
+  <rect x="7" y="7" width="386" height="386" rx="17" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+  <!-- TSU — drop shadow layer -->
+  <text x="202" y="241"
+    text-anchor="middle"
+    font-family="'Arial Black', 'Impact', 'Helvetica Neue', Arial, sans-serif"
+    font-size="162" font-weight="900" letter-spacing="-6"
+    fill="rgba(0,0,0,0.45)">TSU</text>
+
+  <!-- TSU — main white text -->
+  <text x="200" y="238"
+    text-anchor="middle"
+    font-family="'Arial Black', 'Impact', 'Helvetica Neue', Arial, sans-serif"
+    font-size="162" font-weight="900" letter-spacing="-6"
+    fill="white" filter="url(#text-shadow)">TSU</text>
+
+  <!-- ── UNLOCKED PADLOCK ─────────────────────────── -->
+  <!-- Padlock sits over the U / right side of TSU    -->
+
+  <!-- Body — opaque navy fill to cover text beneath -->
+  <rect x="262" y="135" width="72" height="54" rx="8" fill="#0d1e6e"/>
+  <!-- Body border (gold) -->
+  <rect x="262" y="135" width="72" height="54" rx="8"
+    fill="none" stroke="#D4AF37" stroke-width="3.2"/>
+
+  <!-- Shackle: left leg down into body, arc over top, right leg lifted (unlocked) -->
+  <path d="M 275,135 L 275,108 A 23,23 0 0,0 321,108 L 321,70"
+    fill="none" stroke="#D4AF37" stroke-width="3.5"
+    stroke-linecap="round" filter="url(#gold-glow)"/>
+
+  <!-- Slight "open" notch on right side of body top to indicate unlocked -->
+  <rect x="314" y="134" width="14" height="6" rx="2" fill="#0d1e6e"/>
+
+  <!-- Keyhole circle -->
+  <circle cx="298" cy="157" r="8" fill="#D4AF37"/>
+  <!-- Keyhole slot -->
+  <rect x="294.5" y="162" width="7" height="13" rx="2" fill="#D4AF37"/>
+
+  <!-- ── DIVIDER ────────────────────────────────────── -->
+  <line x1="80" y1="270" x2="320" y2="270"
+    stroke="#D4AF37" stroke-width="1.5" opacity="0.5"/>
+
+  <!-- Corner diamonds on divider -->
+  <polygon points="80,270 85,265 90,270 85,275" fill="#D4AF37" opacity="0.6"/>
+  <polygon points="320,270 315,265 310,270 315,275" fill="#D4AF37" opacity="0.6"/>
+
+  <!-- ── LAB TEXT ───────────────────────────────────── -->
+  <text x="200" y="323"
+    text-anchor="middle"
+    font-family="'Arial', 'Helvetica Neue', sans-serif"
+    font-size="44" font-weight="700" letter-spacing="20"
+    fill="#D4AF37" filter="url(#gold-glow)">LAB</text>
+
+  <!-- Bottom decorative line -->
+  <line x1="80" y1="342" x2="320" y2="342"
+    stroke="#D4AF37" stroke-width="1" opacity="0.35"/>
+
+  <!-- Corner dots -->
+  <circle cx="80" cy="342" r="3" fill="#D4AF37" opacity="0.45"/>
+  <circle cx="320" cy="342" r="3" fill="#D4AF37" opacity="0.45"/>
+</svg>

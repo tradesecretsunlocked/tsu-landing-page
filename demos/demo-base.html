@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=1080, initial-scale=1" />
+  <title>Demo — Base Grid Overlay</title>
+  <style>
+    :root {
+      --gold:    #D4AF37;
+      --gold2:   #f0cf72;
+      --navy:    #0d1e6e;
+      --bg0:     #08090e;
+      --bg1:     #0e1020;
+      --bg2:     #141728;
+      --panel:   #0a0b1c;
+      --g-border: rgba(212,175,55,0.28);
+      --border:  rgba(255,255,255,0.08);
+      --green:   #16c784;
+      --text:    #f0f0f0;
+      --muted:   #7a8ab0;
+      --tileH:   54px;
+      --cols:    8;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      width: 1080px; height: 580px; overflow: hidden;
+      background: transparent;
+      font-family: 'Arial Black', 'Arial', Helvetica, sans-serif;
+      color: var(--text);
+      user-select: none;
+    }
+
+    /* Overlay shell */
+    .overlay {
+      width: 1080px; height: 580px;
+      display: grid; grid-template-rows: 54px 1fr 38px;
+      position: relative; overflow: hidden;
+      background:
+        radial-gradient(ellipse 900px 360px at 50% -5%, rgba(13,30,110,0.55), transparent 55%),
+        radial-gradient(ellipse 500px 220px at 85% 20%, rgba(212,175,55,0.07), transparent 50%),
+        linear-gradient(175deg, #08090e 0%, #0a0c1b 100%);
+    }
+    .overlay::before {
+      content: ""; position: absolute; inset: 0; pointer-events: none; z-index: 0;
+      background-image:
+        linear-gradient(rgba(212,175,55,0.038) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(212,175,55,0.038) 1px, transparent 1px);
+      background-size: 52px 52px;
+      mask-image: radial-gradient(ellipse 90% 80% at 50% 30%, black 30%, transparent 80%);
+    }
+    .overlay > * { position: relative; z-index: 1; }
+
+    /* ── HEADER ── */
+    .ov-header {
+      border-bottom: 1px solid var(--g-border);
+      background: linear-gradient(90deg, rgba(13,30,110,0.65), rgba(8,9,14,0.96));
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 18px; gap: 14px;
+    }
+    .ov-brand {
+      font-size: 15px; font-weight: 900; color: var(--gold);
+      letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .ov-center { display: flex; align-items: center; gap: 10px; }
+    .ov-break { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.06em; }
+    .ov-sport {
+      background: var(--navy); border: 1px solid var(--g-border);
+      border-radius: 4px; padding: 3px 12px;
+      font-size: 12px; font-weight: 900; letter-spacing: 0.1em; color: var(--gold);
+    }
+    .ov-count {
+      font-size: 12px; font-weight: 700;
+      background: rgba(22,199,132,0.1); border: 1px solid rgba(22,199,132,0.2);
+      border-radius: 4px; padding: 3px 12px; color: var(--muted);
+      transition: color 0.2s, border-color 0.2s, background 0.2s;
+    }
+    .ov-count.live { color: var(--green); border-color: rgba(22,199,132,0.4); background: rgba(22,199,132,0.14); }
+
+    /* ── BODY ── */
+    .ov-body { display: grid; grid-template-columns: 1fr 188px; overflow: hidden; }
+
+    /* Board */
+    .ov-board { padding: 12px 10px 10px 12px; display: flex; flex-direction: column; }
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(var(--cols), 1fr);
+      gap: 6px;
+      align-content: start;
+    }
+    .tile {
+      height: var(--tileH);
+      background: var(--bg2); border: 1px solid var(--border);
+      border-top: 2px solid rgba(212,175,55,0.18);
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 900; letter-spacing: 0.04em;
+      cursor: pointer; transition: all 0.15s ease; position: relative;
+    }
+    .tile:hover {
+      border-color: var(--gold); border-top-color: var(--gold);
+      background: rgba(212,175,55,0.09); color: var(--gold);
+      box-shadow: 0 0 14px rgba(212,175,55,0.16), inset 0 1px 0 rgba(212,175,55,0.1);
+      transform: translateY(-1px);
+    }
+    .tile.sold {
+      background: rgba(22,199,132,0.12);
+      border-color: rgba(22,199,132,0.5); border-top-color: var(--green);
+      color: var(--green); opacity: 0.82;
+    }
+    .tile.sold::after {
+      content: "✓"; position: absolute; top: 3px; right: 5px;
+      font-size: 8px; color: var(--green); font-weight: 900;
+    }
+
+    /* Sold panel */
+    .ov-sold {
+      background: rgba(7,8,20,0.96); border-left: 1px solid var(--g-border);
+      padding: 10px 8px; display: flex; flex-direction: column; gap: 0;
+      overflow-y: auto;
+    }
+    .sp-header {
+      font-size: 9px; font-weight: 900; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px; padding: 0 2px;
+    }
+    .sp-entry {
+      display: flex; align-items: center; gap: 7px;
+      padding: 5px 6px; margin-bottom: 3px;
+      background: rgba(22,199,132,0.08); border: 1px solid rgba(22,199,132,0.14);
+      border-radius: 5px;
+    }
+    .sp-num { font-size: 9px; color: var(--muted); min-width: 18px; font-weight: 700; }
+    .sp-team { font-size: 12px; font-weight: 900; color: var(--green); }
+    .sp-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--green); flex-shrink: 0; }
+
+    /* Ticker */
+    .ov-ticker {
+      background: #060811; border-top: 1px solid var(--g-border);
+      display: flex; align-items: center; overflow: hidden;
+    }
+    .ticker-track {
+      white-space: nowrap; font-size: 11px; font-weight: 700;
+      color: var(--gold); letter-spacing: 0.1em; text-transform: uppercase;
+      animation: scroll 26s linear infinite;
+    }
+    @keyframes scroll { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* Scrollbar */
+    .ov-sold::-webkit-scrollbar { width: 3px; }
+    .ov-sold::-webkit-scrollbar-track { background: transparent; }
+    .ov-sold::-webkit-scrollbar-thumb { background: rgba(212,175,55,0.3); border-radius: 2px; }
+  </style>
+</head>
+<body>
+<div class="overlay">
+  <div class="ov-header">
+    <span class="ov-brand">Your Brand Name</span>
+    <div class="ov-center">
+      <span class="ov-break" id="break-lbl">BREAK #1</span>
+      <span class="ov-sport" id="sport-lbl">NFL</span>
+    </div>
+    <span class="ov-count" id="sold-count">0 / 32 SOLD</span>
+  </div>
+  <div class="ov-body">
+    <div class="ov-board">
+      <div class="board-grid" id="board-grid"></div>
+    </div>
+    <div class="ov-sold" id="sold-panel">
+      <div class="sp-header">Sold</div>
+    </div>
+  </div>
+  <div class="ov-ticker">
+    <div class="ticker-track">
+      TRADE SECRETS UNLOCKED &nbsp;●&nbsp; CUSTOM CARD BREAK OVERLAYS &nbsp;●&nbsp; tradesecretsunlocked.com &nbsp;●&nbsp; NFL · NBA · MLB &nbsp;●&nbsp; POWERED BY TSU BRIDGE &nbsp;●&nbsp; &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+      TRADE SECRETS UNLOCKED &nbsp;●&nbsp; CUSTOM CARD BREAK OVERLAYS &nbsp;●&nbsp; tradesecretsunlocked.com &nbsp;●&nbsp; NFL · NBA · MLB &nbsp;●&nbsp; POWERED BY TSU BRIDGE &nbsp;●&nbsp;
+    </div>
+  </div>
+</div>
+<script>
+  const SPORTS = {
+    nfl: { label:'NFL', cols:8, teams:['ARI','ATL','BAL','BUF','CAR','CHI','CIN','CLE','DAL','DEN','DET','GB','HOU','IND','JAX','KC','LAC','LAR','LV','MIA','MIN','NE','NO','NYG','NYJ','PHI','PIT','SEA','SF','TB','TEN','WAS'] },
+    nba: { label:'NBA', cols:6, teams:['ATL','BKN','BOS','CHA','CHI','CLE','DAL','DEN','DET','GSW','HOU','IND','LAC','LAL','MEM','MIA','MIL','MIN','NOP','NYK','OKC','ORL','PHI','PHX','POR','SAC','SAS','TOR','UTA','WAS'] },
+    mlb: { label:'MLB', cols:6, teams:['ARI','ATL','BAL','BOS','CHC','CWS','CIN','CLE','COL','DET','HOU','KC','LAA','LAD','MIA','MIL','MIN','NYM','NYY','OAK','PHI','PIT','SD','SEA','SF','STL','TB','TEX','TOR','WAS'] }
+  };
+  let sport = 'nfl';
+  const sold = new Set();
+  let soldList = [];
+
+  function render(s) {
+    sport = s;
+    const sp = SPORTS[s];
+    document.getElementById('sport-lbl').textContent = sp.label;
+    document.documentElement.style.setProperty('--cols', sp.cols);
+    sold.clear(); soldList = [];
+    const grid = document.getElementById('board-grid');
+    grid.innerHTML = sp.teams.map(t =>
+      `<div class="tile" data-t="${t}">${t}</div>`).join('');
+    grid.querySelectorAll('.tile').forEach(el =>
+      el.addEventListener('click', () => toggle(el.dataset.t)));
+    refresh();
+  }
+
+  function toggle(code) {
+    if (sold.has(code)) { sold.delete(code); soldList = soldList.filter(c=>c!==code); }
+    else { sold.add(code); soldList.push(code); }
+    document.querySelector(`.tile[data-t="${code}"]`)?.classList.toggle('sold', sold.has(code));
+    refresh();
+  }
+
+  function refresh() {
+    const sp = SPORTS[sport];
+    const cnt = sold.size, total = sp.teams.length;
+    const el = document.getElementById('sold-count');
+    el.textContent = `${cnt} / ${total} SOLD`;
+    el.classList.toggle('live', cnt > 0);
+    const panel = document.getElementById('sold-panel');
+    panel.innerHTML = '<div class="sp-header">Sold</div>' +
+      soldList.map((t,i) =>
+        `<div class="sp-entry"><span class="sp-num">#${i+1}</span><div class="sp-dot"></div><span class="sp-team">${t}</span></div>`
+      ).join('');
+    window.parent?.postMessage({ type:'boardUpdate', sold:cnt, total }, '*');
+  }
+
+  window.addEventListener('message', e => {
+    if (e.data?.type === 'setSport') render(e.data.sport);
+    if (e.data?.type === 'resetBoard') render(sport);
+  });
+
+  render('nfl');
+</script>
+</body>
+</html>
