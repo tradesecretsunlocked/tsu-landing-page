@@ -1208,7 +1208,14 @@
     { folder: 'sms',                name: 'Score More Sports',  features: ['Skyline Background', 'Cam Layout', 'Orange & Black'], desc: 'City skyline silhouette behind the header panel. Modular cam + side panel layout built for multi-sport breaks.' },
     { folder: 'the-rated-pull',     name: 'The Rated Pull',     features: ['Live SSE Bridge', 'Auto-Mark Sold', 'Multi-Sport'],   desc: 'Full live automation — teams mark sold automatically from Whatnot sales in real time via the TSU Bridge.' }
   ];
-  const P_BASE = 'https://tradesecretsunlocked.github.io/card-break-overlay/overlays/';
+  // ===== PORTFOLIO CAROUSEL (DEMO MODE - Local demo overlays, NOT production) =====
+  // Demo overlays are created in /demos/demo-portfolio/ and have bridge communication disabled
+  // This ensures landing page interactions don't interfere with live client streams
+  const DEMO_MODE = true;  // Set to false to load production overlays from GitHub Pages
+  const P_BASE_DEMO = '/demos/demo-portfolio/';
+  const P_BASE_PROD = 'https://tradesecretsunlocked.github.io/card-break-overlay/overlays/';
+  const P_BASE = DEMO_MODE ? P_BASE_DEMO : P_BASE_PROD;
+
   let pIdx = 0;
   const pLoaded = new Set();
   const pIframes = [];
@@ -1222,6 +1229,7 @@
       f.className = 'portfolio-iframe';
       f.style.display = 'none';
       f.setAttribute('allowfullscreen', '');
+      f.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');  // Sandboxed for extra safety
       container.appendChild(f);
       pIframes.push(f);
       const dot = document.createElement('div');
@@ -1247,7 +1255,12 @@
     pIframes.forEach((f, i) => { f.style.display = i === pIdx ? 'block' : 'none'; });
     document.querySelectorAll('.portfolio-dot').forEach((d, i) => d.classList.toggle('active', i === pIdx));
     if (!pLoaded.has(pIdx)) {
-      pIframes[pIdx].src = P_BASE + client.folder + '/index.html';
+      // Load demo version (bridge disabled) or production version based on DEMO_MODE flag
+      const fileName = DEMO_MODE ? `${client.folder}-demo.html` : `index.html`;
+      const srcPath = DEMO_MODE
+        ? `${P_BASE}${fileName}`
+        : `${P_BASE}${client.folder}/${fileName}`;
+      pIframes[pIdx].src = srcPath;
       pLoaded.add(pIdx);
     }
     document.getElementById('portfolio-name').textContent = client.name;
