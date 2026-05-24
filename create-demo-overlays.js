@@ -3,27 +3,44 @@
 const fs = require('fs');
 const path = require('path');
 
+// Layout A–H showcase set — maps to the questionnaire's Layout Preference options.
 const overlays = [
-  'apex-card-company',
-  'bigtime',
-  'breakout-kings',
-  'chasin-nukes',
-  'h-vault',
-  'northland-breaks',
-  'lnl',
-  'pack-smashers',
-  'sms',
-  'the-rated-pull'
+  'bigtime',          // Layout A — Split Grid
+  'deathstar',        // Layout B — Custom Tile Grid
+  'choice-breaks',    // Layout C — Single Grid Center Promo
+  'midwestbreak',     // Layout D — Single Grid Ticker Banner
+  'h-vault',          // Layout E — Grid Camera Embed
+  'jp2-cards',        // Layout F — Chase Teams / Custom Banner
+  'bird-dogz-breaks', // Layout G — Center Promo / Custom Banner
+  'sms'               // Layout H — 3-Panel Camera Embed Banner
 ];
 
-const DEMO_BANNER = `
-  <!-- ===== DEMO MODE BANNER ===== -->
-  <div style="position: fixed; top: 0; left: 0; right: 0; background: #ff6b00; color: white; padding: 8px; text-align: center; font-weight: bold; z-index: 99999; font-family: Arial, sans-serif;">
-    🎬 DEMO MODE – This is a preview. Not connected to live client streams.
-  </div>
-  <style>
-    body { padding-top: 36px !important; }
-  </style>
+// Runs before any overlay script — kills every live bridge connection (SSE in, fetch/XHR out)
+// so a demo embedded on the landing page can never touch a live client stream.
+const DEMO_GUARD = `
+  <!-- ===== DEMO MODE GUARD — neutralizes all live bridge connectivity ===== -->
+  <script>
+  (function(){
+    var BLOCK = /bridge\\.tradesecretsunlocked\\.com|onrender\\.com/i;
+    try {
+      window.EventSource = function(){
+        return { close:function(){}, addEventListener:function(){}, removeEventListener:function(){},
+                 dispatchEvent:function(){return false;}, onmessage:null, onerror:null, onopen:null,
+                 readyState:2, url:'' };
+      };
+    } catch(e){}
+    var realFetch = window.fetch;
+    if (realFetch) window.fetch = function(u){
+      try { if (BLOCK.test(String(u))) return Promise.resolve(new Response('{}', {status:200, headers:{'Content-Type':'application/json'}})); } catch(e){}
+      return realFetch.apply(this, arguments);
+    };
+    try {
+      var rOpen = XMLHttpRequest.prototype.open, rSend = XMLHttpRequest.prototype.send;
+      XMLHttpRequest.prototype.open = function(m,u){ this.__demoBlock = BLOCK.test(String(u)); return rOpen.apply(this, arguments); };
+      XMLHttpRequest.prototype.send = function(){ if (this.__demoBlock) return; return rSend.apply(this, arguments); };
+    } catch(e){}
+  })();
+  </script>
 `;
 
 overlays.forEach(folderName => {
@@ -82,11 +99,13 @@ overlays.forEach(folderName => {
   }`
     );
 
-    // 5. Add demo banner inside body tag (after <body>)
+    // 5. Inject <base> (relative assets resolve against the deployed repo) + the demo guard
     html = html.replace(
-      /<body[^>]*>/i,
+      /<head[^>]*>/i,
       (match) => {
-        return match + DEMO_BANNER;
+        return match +
+          '\n  <base href="https://tradesecretsunlocked.github.io/card-break-overlay/overlays/' + folderName + '/">' +
+          DEMO_GUARD;
       }
     );
 

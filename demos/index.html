@@ -1,34 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <base href="https://tradesecretsunlocked.github.io/card-break-overlay/overlays/sms/">
-  <!-- ===== DEMO MODE GUARD — neutralizes all live bridge connectivity ===== -->
-  <script>
-  (function(){
-    var BLOCK = /bridge\.tradesecretsunlocked\.com|onrender\.com/i;
-    try {
-      window.EventSource = function(){
-        return { close:function(){}, addEventListener:function(){}, removeEventListener:function(){},
-                 dispatchEvent:function(){return false;}, onmessage:null, onerror:null, onopen:null,
-                 readyState:2, url:'' };
-      };
-    } catch(e){}
-    var realFetch = window.fetch;
-    if (realFetch) window.fetch = function(u){
-      try { if (BLOCK.test(String(u))) return Promise.resolve(new Response('{}', {status:200, headers:{'Content-Type':'application/json'}})); } catch(e){}
-      return realFetch.apply(this, arguments);
-    };
-    try {
-      var rOpen = XMLHttpRequest.prototype.open, rSend = XMLHttpRequest.prototype.send;
-      XMLHttpRequest.prototype.open = function(m,u){ this.__demoBlock = BLOCK.test(String(u)); return rOpen.apply(this, arguments); };
-      XMLHttpRequest.prototype.send = function(){ if (this.__demoBlock) return; return rSend.apply(this, arguments); };
-    } catch(e){}
-  })();
-  </script>
-
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=1080, initial-scale=1.0" />
-  <title>[DEMO] Score More Sports – Multi-Sport Break Overlay</title>
+  <title>Score More Sports – Multi-Sport Break Overlay</title>
 
   <style>
     :root{
@@ -1091,7 +1066,7 @@ const CHANNELS = (() => {
   const BANNERS = [
     { badge: "IG",   image: bannerImg('ig.png') },
     { badge: "DIS",  image: bannerImg('discord.png') },
-    { badge: "PRO",  image: bannerImg('sms-promo.png') }
+    { badge: "PRO",  image: bannerImg('promo.png') }
   ];
 
   /* =========================

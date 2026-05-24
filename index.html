@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Trade Secrets Unlocked — Custom Card Break Stream Overlays</title>
+  <title>Trade Secrets Unlocked - Custom Card Break Stream Overlays</title>
   <meta name="description" content="Custom-built OBS overlays for card break streamers on Whatnot. Your branding, your sport, fully automated. NFL, NBA, MLB. Delivered in days." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
@@ -124,14 +124,14 @@
     }
     .nav-inner {
       display: flex; align-items: center; justify-content: space-between;
-      height: 64px;
+      height: 74px;
     }
     .nav-logo {
       display: flex; align-items: center; gap: 10px;
     }
     .nav-logo-img {
-      height: 36px; width: 36px; border-radius: 6px;
-      object-fit: cover;
+      height: 65px; width: auto; max-width: 280px;
+      object-fit: contain; display: block;
     }
     .nav-logo-img-fallback {
       height: 36px; width: 36px; border-radius: 6px;
@@ -141,7 +141,7 @@
       flex-shrink: 0;
     }
     .nav-logo-text {
-      font-size: 17px; font-weight: 900; letter-spacing: -0.02em;
+      font-size: 18px; font-weight: 900; letter-spacing: -0.02em;
     }
     .nav-logo-text .tsu { color: var(--gold); }
     .nav-logo-text .rest { color: var(--text); }
@@ -149,69 +149,135 @@
       display: flex; align-items: center; gap: 32px; list-style: none;
     }
     .nav-links a {
-      font-size: 14px; font-weight: 500; color: var(--muted);
-      transition: color var(--transition);
+      font-size: 15.5px; font-weight: 700; color: var(--gold);
+      letter-spacing: 0.01em; transition: color var(--transition);
     }
-    .nav-links a:hover { color: var(--text); }
+    .nav-links a:hover { color: var(--gold2); }
     .nav-cta { display: flex; gap: 10px; align-items: center; }
     @media (max-width: 768px) { .nav-links { display: none; } }
 
     /* ===== HERO ===== */
     #hero {
       position: relative; overflow: hidden;
-      padding: 160px 0 100px;
+      padding: 100px 0 30px;
       background:
         radial-gradient(ellipse 800px 400px at 20% -10%, rgba(13,30,110,0.45), transparent 60%),
         radial-gradient(ellipse 600px 300px at 80% 10%, rgba(212,175,55,0.08), transparent 55%),
         var(--bg0);
     }
-    .hero-content { position: relative; z-index: 1; max-width: 820px; }
+    .hero-grid {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: 1.04fr 0.96fr;
+      gap: 52px; align-items: center; margin-bottom: 60px;
+    }
+    @media (max-width: 920px) { .hero-grid { grid-template-columns: 1fr; gap: 44px; } }
+    .hero-content { position: relative; z-index: 1; }
     .hero-badge {
       display: inline-flex; align-items: center; gap: 8px;
       background: rgba(13,30,110,0.4); border: 1px solid var(--border-gold);
       border-radius: 100px; padding: 6px 16px;
-      font-size: 13px; font-weight: 600; color: var(--gold); margin-bottom: 28px;
+      font-size: 13px; font-weight: 600; color: var(--gold); margin-bottom: 26px;
     }
     .hero-badge::before { content: "●"; font-size: 9px; color: var(--green); }
     .hero-h1 {
-      font-size: clamp(34px, 5.5vw, 64px); font-weight: 900;
-      line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 24px;
+      font-size: clamp(34px, 5vw, 58px); font-weight: 900;
+      line-height: 1.08; letter-spacing: -0.03em; margin-bottom: 22px;
     }
     .hero-h1 em { font-style: normal; color: var(--gold); }
     .hero-sub {
-      font-size: clamp(16px, 2vw, 19px); color: var(--muted);
-      line-height: 1.75; max-width: 600px; margin-bottom: 40px;
+      font-size: clamp(15px, 1.6vw, 17px); color: var(--muted);
+      line-height: 1.75; margin-bottom: 34px;
     }
-    .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 64px; }
-    .hero-stats {
-      display: flex; flex-wrap: wrap; gap: 0;
-      border: 1px solid var(--border); border-radius: var(--radius);
-      overflow: hidden; background: var(--card);
+    .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
+    .hero-cta .btn-gold {
+      font-size: 16.5px; padding: 18px 36px;
+      animation: cta-pulse 2.8s ease-in-out infinite;
     }
-    .hero-stat {
-      flex: 1; min-width: 150px; padding: 20px 28px;
-      border-right: 1px solid var(--border);
+    @keyframes cta-pulse {
+      0%, 100% { box-shadow: 0 0 18px rgba(212,175,55,0.28); }
+      50%      { box-shadow: 0 0 40px rgba(212,175,55,0.62); }
     }
-    .hero-stat:last-child { border-right: none; }
-    .hero-stat-val {
-      font-size: 26px; font-weight: 900; color: var(--gold);
-      letter-spacing: -0.02em; line-height: 1;
+    @media (prefers-reduced-motion: reduce) { .hero-cta .btn-gold { animation: none; } }
+
+    /* Hero visual — framed live overlay preview */
+    /* Hero visual — two overlapping overlay screenshots */
+    .hero-shots {
+      position: relative; z-index: 1;
+      width: 100%; max-width: 460px; margin: 0 auto;
+      aspect-ratio: 1 / 1.16;
     }
-    .hero-stat-label { font-size: 13px; color: var(--muted); margin-top: 4px; }
+    @media (max-width: 920px) { .hero-shots { max-width: 420px; } }
+    .hero-shot {
+      position: absolute; width: 77%;
+      border-radius: 16px; border: 1px solid var(--border-gold);
+    }
+    .hero-shot-back {
+      right: -91px; top: -24px; transform: rotate(8deg); z-index: 4;
+      box-shadow: 0 20px 44px rgba(0,0,0,0.6);
+    }
+    .hero-shot-front {
+      left: 0; bottom: -59px; transform: rotate(-4deg); z-index: 2;
+      box-shadow: 0 28px 58px rgba(0,0,0,0.82), 0 0 50px var(--gold-dim);
+    }
+
+    /* Hero metric boxes */
+    .hero-metrics {
+      position: relative; z-index: 1;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px;
+    }
+    @media (max-width: 760px) { .hero-metrics { grid-template-columns: repeat(2, 1fr); } }
+    .metric {
+      background: var(--card); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 22px;
+      position: relative; overflow: hidden;
+      transition: border-color var(--transition), transform var(--transition);
+    }
+    .metric:hover { border-color: var(--border-gold); transform: translateY(-3px); }
+    .metric::before {
+      content: ""; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+      background: linear-gradient(90deg, var(--navy), var(--gold), transparent);
+    }
+    .metric-icon { font-size: 22px; margin-bottom: 12px; }
+    .metric-big {
+      font-size: 31px; font-weight: 900; color: var(--gold);
+      letter-spacing: -0.02em; line-height: 1; margin-bottom: 5px;
+    }
+    .metric-name { font-size: 14.5px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
+    .metric-label { font-size: 13px; color: var(--muted); line-height: 1.55; }
 
     /* ===== PROOF BANNER ===== */
     #proof-banner {
-      padding: 32px 0;
+      padding: 10px 0;
       background: linear-gradient(90deg, #0b0c15, #0e1020, #0b0c15);
       border-top: 1px solid var(--border);
       border-bottom: 1px solid var(--border-navy);
       overflow: hidden;
     }
-    .proof-track {
-      display: flex; gap: 60px; align-items: center; white-space: nowrap;
+    .proof-heading {
+      text-align: center;
+      font-size: 14px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 28px;
     }
-    .proof-item { font-size: 13px; font-weight: 700; color: var(--muted); letter-spacing: 0.04em; flex-shrink: 0; }
-    .proof-item span { color: var(--gold); }
+    .proof-heading span { color: var(--gold); }
+    .logo-marquee {
+      position: relative; overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+      mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+    }
+    .logo-track {
+      display: flex; align-items: center; width: max-content;
+      animation: logo-scroll 125s linear infinite;
+    }
+    .logo-track:hover { animation-play-state: paused; }
+    .logo-track img {
+      height: 84px; width: auto; margin: 0 38px;
+      flex-shrink: 0; object-fit: contain;
+    }
+    @keyframes logo-scroll {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    @media (prefers-reduced-motion: reduce) { .logo-track { animation: none; } }
 
     /* ===== DEMO ===== */
     #demo { padding: 100px 0; background: var(--bg1); position: relative; overflow: hidden; }
@@ -261,10 +327,10 @@
     .demo-layout-info { font-size: 12px; color: var(--muted2); }
 
     /* ===== PORTFOLIO ===== */
-    #portfolio { padding: 100px 0 80px; background: var(--bg1); }
+    #portfolio { padding: 40px 0 40px; background: var(--bg1); }
     .portfolio-stage-wrap { position: relative; padding: 0 28px; }
     .portfolio-iframe-container { position: relative; overflow: hidden; background: var(--bg0); border-radius: var(--radius-lg); border: 1px solid var(--border); }
-    .portfolio-iframe { width: 1080px; height: 580px; border: none; display: block; transform-origin: top left; }
+    .portfolio-iframe { border: none; display: block; transform-origin: top left; }
     .portfolio-arrow {
       position: absolute; top: 50%; transform: translateY(-50%);
       width: 44px; height: 44px; border-radius: 50%;
@@ -287,42 +353,100 @@
     .portfolio-tag { font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; background: rgba(212,175,55,0.08); border: 1px solid rgba(212,175,55,0.22); color: var(--gold); border-radius: 4px; padding: 3px 9px; }
     .portfolio-count { font-size: 13px; font-weight: 700; color: var(--muted2); white-space: nowrap; padding-top: 4px; }
 
+    /* Layout A–H selector */
+    .layout-tabs { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-bottom: 22px; }
+    .layout-tab {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--bg2); border: 1px solid var(--border);
+      border-radius: 8px; padding: 8px 14px; color: var(--muted);
+      transition: all var(--transition); white-space: nowrap;
+    }
+    .layout-tab:hover:not(.active) { color: var(--text); border-color: var(--border-gold); }
+    .layout-tab.active { background: var(--gold); color: #0a0a0a; border-color: var(--gold); }
+    .layout-tab .lt-letter { font-size: 14px; font-weight: 900; line-height: 1; }
+    .layout-tab .lt-name { font-size: 12px; font-weight: 600; }
+    @media (max-width: 600px) { .layout-tab .lt-name { display: none; } }
+
+    /* Layout O - custom callout */
+    .custom-layout-note {
+      margin-top: 30px; padding: 24px 28px;
+      background: var(--card); border: 1px solid var(--border-navy);
+      border-radius: var(--radius-lg);
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 24px; flex-wrap: wrap;
+    }
+    .custom-layout-title { font-size: 16px; font-weight: 800; color: var(--gold); margin-bottom: 6px; }
+    .custom-layout-desc { font-size: 14px; color: var(--muted); line-height: 1.6; max-width: 620px; }
+
+    /* ===== MID-PAGE CTA ===== */
+    .mid-cta-section { padding: 26px 0 36px; background: var(--bg1); }
+    .mid-cta {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 28px; flex-wrap: wrap;
+      background: linear-gradient(120deg, #100d02 0%, var(--bg3) 62%);
+      border: 1px solid var(--border-gold); border-radius: var(--radius-lg);
+      padding: 28px 40px;
+      box-shadow: 0 0 46px rgba(212,175,55,0.08);
+    }
+    .mid-cta-title { font-size: 21px; font-weight: 800; line-height: 1.25; }
+    .mid-cta-title em { font-style: normal; color: var(--gold); }
+    .mid-cta-sub { font-size: 14px; color: var(--muted); margin-top: 5px; }
+    .mid-cta .btn { font-size: 15.5px; padding: 16px 32px; }
+    @media (max-width: 560px) { .mid-cta { padding: 24px 22px; } }
+
     /* ===== HOW IT WORKS ===== */
-    #how-it-works { padding: 100px 0; background: var(--bg0); }
-    .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px; }
-    .step {
+    #how-it-works { padding: 29px 0; background: var(--bg0); }
+    .timeline { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    @media (max-width: 880px) { .timeline { grid-template-columns: repeat(2, 1fr); gap: 28px 20px; } }
+    @media (max-width: 480px) { .timeline { grid-template-columns: 1fr; } }
+    .tl-step {
+      position: relative;
       background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius-lg); padding: 36px 32px;
-      position: relative; overflow: hidden; transition: border-color var(--transition);
+      border-radius: var(--radius-lg); padding: 30px 26px;
+      transition: border-color var(--transition), transform var(--transition);
     }
-    .step:hover { border-color: var(--border-gold); }
-    .step::before {
-      content: ""; position: absolute; top: 0; left: 0; right: 0;
-      height: 2px; background: linear-gradient(90deg, var(--navy), var(--gold), transparent);
+    .tl-step:hover { border-color: var(--border-gold); transform: translateY(-4px); }
+    .tl-node {
+      width: 48px; height: 48px; border-radius: 50%;
+      background: var(--navy); border: 2px solid var(--gold);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 19px; font-weight: 900; color: var(--gold);
+      margin-bottom: 18px; position: relative; z-index: 2;
     }
-    .step-num { font-size: 48px; font-weight: 900; color: rgba(212,175,55,0.12); line-height: 1; margin-bottom: 18px; letter-spacing: -0.04em; }
-    .step-icon { font-size: 28px; margin-bottom: 14px; }
-    .step-title { font-size: 18px; font-weight: 800; margin-bottom: 10px; }
-    .step-desc { font-size: 15px; color: var(--muted); line-height: 1.65; }
+    /* connector line between timeline nodes */
+    .tl-step::after {
+      content: ""; position: absolute;
+      top: 54px; left: 74px; right: -20px; height: 2px; z-index: 0;
+      background: linear-gradient(90deg, var(--gold), rgba(212,175,55,0.18));
+    }
+    .tl-step:last-child::after { display: none; }
+    @media (max-width: 880px) { .tl-step:nth-child(2n)::after { display: none; } }
+    @media (max-width: 480px) { .tl-step::after { display: none; } }
+    .tl-icon { font-size: 26px; margin-bottom: 12px; }
+    .tl-title { font-size: 17px; font-weight: 800; margin-bottom: 9px; }
+    .tl-desc { font-size: 14px; color: var(--muted); line-height: 1.65; }
 
     /* ===== PACKAGES ===== */
-    #packages { padding: 100px 0; background: var(--bg1); }
+    #packages { padding: 40px 0; background: var(--bg1); }
 
+    .tsu-lab-frame {
+      border: 2px solid var(--border-gold); border-radius: 24px;
+      padding: 6px 25px 20px;
+      background:
+        radial-gradient(ellipse 620px 220px at 50% 0%, rgba(212,175,55,0.08), transparent 70%),
+        var(--bg2);
+      box-shadow: 0 0 56px rgba(212,175,55,0.07), inset 0 1px 0 rgba(255,255,255,0.03);
+    }
+    @media (max-width: 600px) { .tsu-lab-frame { padding: 30px 18px 34px; } }
     .tsu-lab-header {
-      display: flex; flex-direction: column; align-items: center; gap: 12px;
-      margin-bottom: 48px;
+      display: flex; flex-direction: column; align-items: center; gap: 8px;
+      margin-bottom: 20px;
     }
-    .tsu-lab-logo-wrap {
-      display: flex; align-items: center; gap: 14px;
-      background: var(--card); border: 1px solid var(--border-gold);
-      border-radius: 14px; padding: 12px 24px;
+    .tsu-lab-header img { height: 116px; width: auto; max-width: 100%; }
+    .tsu-lab-sub {
+      font-size: 12px; font-weight: 700; letter-spacing: 0.14em;
+      text-transform: uppercase; color: var(--muted);
     }
-    .tsu-lab-logo-wrap img { height: 52px; width: 52px; border-radius: 8px; }
-    .tsu-lab-logo-wrap .tsu-lab-text { }
-    .tsu-lab-logo-wrap .tsu-lab-name {
-      font-size: 17px; font-weight: 900; color: var(--gold); letter-spacing: 0.04em;
-    }
-    .tsu-lab-logo-wrap .tsu-lab-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
 
     .pkg-grid {
       display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -468,7 +592,7 @@
     .t-platform { font-size: 12px; color: var(--muted); }
 
     /* ===== FAQ ===== */
-    #faq { padding: 100px 0; background: var(--bg1); }
+    #faq { padding: 20px 0; background: var(--bg1); }
     .faq-grid { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
     .faq-item {
       background: var(--card); border: 1px solid var(--border);
@@ -513,7 +637,7 @@
     @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
     .footer-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-    .footer-logo-img { height: 36px; width: 36px; border-radius: 6px; }
+    .footer-logo-img { height: 46px; width: auto; max-width: 230px; }
     .footer-logo-text { font-size: 17px; font-weight: 900; letter-spacing: -0.02em; }
     .footer-logo-text .tsu { color: var(--gold); }
     .footer-brand p { font-size: 14px; color: var(--muted); line-height: 1.7; max-width: 260px; }
@@ -577,7 +701,7 @@
       width: 34px; height: 34px; border-radius: 50%;
       overflow: hidden; border: 1.5px solid var(--gold); flex-shrink: 0;
     }
-    .chat-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .chat-avatar img { width: 100%; height: 100%; object-fit: contain; padding: 3px; }
     .chat-avatar-fallback {
       width: 34px; height: 34px; border-radius: 50%;
       background: var(--navy); border: 1.5px solid var(--gold);
@@ -650,15 +774,12 @@
   <div class="container">
     <div class="nav-inner">
       <a href="#" class="nav-logo">
-        <!-- Place your TSU logo PNG at assets/tsu-logo.png to replace the fallback -->
-        <img src="assets/tsu-logo.png" alt="TSU" class="nav-logo-img"
-          onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';" />
-        <div class="nav-logo-img-fallback" style="display:none">TSU</div>
-        <span class="nav-logo-text"><span class="tsu">TSU</span> <span class="rest">— Trade Secrets Unlocked</span></span>
+        <img src="assets/tsu-logo.png" alt="Trade Secrets Unlocked" class="nav-logo-img"
+          onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
+        <span class="nav-logo-text" style="display:none"><span class="tsu">TSU</span> <span class="rest">- Trade Secrets Unlocked</span></span>
       </a>
       <ul class="nav-links">
-        <li><a href="#demo">Live Demo</a></li>
-        <li><a href="#portfolio">Our Work</a></li>
+        <li><a href="#portfolio">Layouts &amp; Demos</a></li>
         <li><a href="#how-it-works">How It Works</a></li>
         <li><a href="#packages">Packages</a></li>
         <li><a href="#testimonials">Reviews</a></li>
@@ -675,36 +796,50 @@
 <section id="hero">
   <div class="grid-bg"></div>
   <div class="container">
-    <div class="hero-content">
-      <div class="hero-badge">Now serving 60+ card break streamers</div>
-      <h1 class="hero-h1">
-        The Overlay That Makes Your Card Break<br>
-        <em>Look Like a TV Broadcast.</em>
-      </h1>
-      <p class="hero-sub">
-        Custom-built OBS overlays for Whatnot card break streamers. Your logo, your colors, your sport — fully automated and ready to go live.
-      </p>
-      <div class="hero-cta">
-        <a href="#demo" class="btn btn-gold">&#9654; Watch It Live</a>
-        <a href="#packages" class="btn btn-outline">View Packages &rarr;</a>
+    <div class="hero-grid">
+      <div class="hero-content">
+        <div class="hero-badge">Now powering 60+ card break streamers</div>
+        <h1 class="hero-h1">
+          Your Break Looks Amateur.<br>
+          <em>Your Buyers Notice.</em>
+        </h1>
+        <p class="hero-sub">
+          Still running your break off a paper sheet — scribbling in team names, scratching them out, scrambling to write down who bought what while you're live on camera? It's a mess, it's hard to follow, and it makes you look unorganized and inexperienced. <strong style="color:var(--text)">Now picture this:</strong> a buyer hits purchase and their team locks in on a clean, professional-grade board — automatically. No paper. No scribbles. No mistakes. <strong style="color:var(--text)">That's a TSU overlay</strong> — and it's why your stream starts looking like the pros.
+        </p>
+        <div class="hero-cta">
+          <a href="#portfolio" class="btn btn-gold">See Real Builds &rarr;</a>
+          <a href="#packages" class="btn btn-outline">View Packages &rarr;</a>
+        </div>
       </div>
-      <div class="hero-stats">
-        <div class="hero-stat">
-          <div class="hero-stat-val">60+</div>
-          <div class="hero-stat-label">Overlays Delivered</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-val">NFL · NBA · MLB</div>
-          <div class="hero-stat-label">All Major Sports</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-val">Whatnot</div>
-          <div class="hero-stat-label">Live Automation Ready</div>
-        </div>
-        <div class="hero-stat">
-          <div class="hero-stat-val">$188</div>
-          <div class="hero-stat-label">Starting Price</div>
-        </div>
+      <div class="hero-shots">
+        <img class="hero-shot hero-shot-back" src="assets/gallery/web/quantumBreaksSold.jpg" alt="TSU overlay — live sold-list view" loading="lazy" />
+        <img class="hero-shot hero-shot-front" src="assets/gallery/web/quantumbreaks.jpg" alt="TSU overlay — live break board" />
+      </div>
+    </div>
+    <div class="hero-metrics">
+      <div class="metric fade-up">
+        <div class="metric-icon">🎯</div>
+        <div class="metric-big">+30%</div>
+        <div class="metric-name">More Bids Per Break</div>
+        <div class="metric-label">A polished, professional-grade board builds instant buyer trust — bidders jump in faster and push higher.</div>
+      </div>
+      <div class="metric fade-up" style="transition-delay:0.08s">
+        <div class="metric-icon">📈</div>
+        <div class="metric-big">+45%</div>
+        <div class="metric-name">Longer Watch Time</div>
+        <div class="metric-label">A clean, animated overlay turns your break into a show — viewers stick around to the end.</div>
+      </div>
+      <div class="metric fade-up" style="transition-delay:0.16s">
+        <div class="metric-icon">🔁</div>
+        <div class="metric-big">+35%</div>
+        <div class="metric-name">Repeat Buyers</div>
+        <div class="metric-label">Look pro once and you're the channel they remember — they come back break after break.</div>
+      </div>
+      <div class="metric fade-up" style="transition-delay:0.24s">
+        <div class="metric-icon">⚡</div>
+        <div class="metric-big">5+ hrs</div>
+        <div class="metric-name">Saved Every Stream</div>
+        <div class="metric-label">Hours you'd lose to paper and manual tracking go straight back into sourcing, promoting, and running more breaks.</div>
       </div>
     </div>
   </div>
@@ -712,77 +847,28 @@
 
 <!-- ===== PROOF BANNER ===== -->
 <section id="proof-banner">
-  <div class="container">
-    <div class="proof-track">
-      <div class="proof-item">&#9733; <span>Whatnot</span> Compatible</div>
-      <div class="proof-item">&#9733; <span>OBS</span> Browser Source Ready</div>
-      <div class="proof-item">&#9733; <span>NFL · NBA · MLB</span> Team Breaks</div>
-      <div class="proof-item">&#9733; <span>Live Automation</span> via TSU Bridge</div>
-      <div class="proof-item">&#9733; <span>Custom Branding</span> — Logo, Colors, Layout</div>
-      <div class="proof-item">&#9733; <span>Stream Graphics</span> Pack Available</div>
-      <div class="proof-item">&#9733; <span>1-Hour</span> Google Meet Setup Session</div>
-      <div class="proof-item">&#9733; <span>60+</span> Overlays Built &amp; Deployed</div>
-    </div>
+  <div class="proof-heading">TSU-Powered Breakers — <span>real streamers running TSU overlays live</span></div>
+  <div class="logo-marquee">
+    <div class="logo-track" id="logo-track"></div>
   </div>
 </section>
 
-<!-- ===== DEMO ===== -->
-<section id="demo">
-  <div class="container">
-    <div class="section-header fade-up">
-      <p class="section-label">Interactive Preview</p>
-      <h2 class="section-title">See Exactly What You're Getting</h2>
-      <p class="section-sub">This isn't a screenshot. Click a team to mark it sold. Switch sports. Try every layout — this is the real product.</p>
-    </div>
-    <div class="fade-up">
-      <div class="demo-controls">
-        <div class="tab-group" id="sport-tabs">
-          <button class="tab-btn active" data-sport="nfl">NFL</button>
-          <button class="tab-btn" data-sport="nba">NBA</button>
-          <button class="tab-btn" data-sport="mlb">MLB</button>
-        </div>
-        <div class="tab-group" id="layout-tabs">
-          <button class="tab-btn active" data-layout="base">Base Grid</button>
-          <button class="tab-btn" data-layout="split">Split Board</button>
-          <button class="tab-btn" data-layout="three">3-Column</button>
-        </div>
-      </div>
-      <p class="demo-hint"><strong>Click any team tile to mark it SOLD.</strong> Switch sports or layouts above.</p>
-      <div class="demo-stage-wrap">
-        <div class="demo-stage-bar">
-          <div class="demo-dot"></div><div class="demo-dot"></div><div class="demo-dot"></div>
-          <span class="demo-stage-label">OBS BROWSER SOURCE — LIVE OVERLAY</span>
-          <span class="demo-stage-counter" id="sold-counter">0 / 32 SOLD</span>
-        </div>
-        <div class="demo-iframe-container" id="demo-iframe-wrap">
-          <iframe class="demo-iframe" id="iframe-base"  src="demos/demo-base.html"></iframe>
-          <iframe class="demo-iframe" id="iframe-split" src="demos/demo-split.html" style="display:none"></iframe>
-          <iframe class="demo-iframe" id="iframe-three" src="demos/demo-three.html" style="display:none"></iframe>
-        </div>
-      </div>
-      <div class="demo-reset-row">
-        <button class="demo-reset-btn" id="demo-reset">&#8635; Reset Board</button>
-        <span class="demo-layout-info" id="layout-info">Full-width team grid · Sold panel on the right</span>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== PORTFOLIO ===== -->
+<!-- ===== LAYOUTS / LIVE DEMOS ===== -->
 <section id="portfolio">
   <div class="container">
     <div class="section-header fade-up">
-      <p class="section-label">Client Overlays</p>
-      <h2 class="section-title">Real Builds. Real Streamers.</h2>
-      <p class="section-sub">Every overlay below is live on Whatnot right now. Custom-built for each client's brand — click any team tile and see how it actually works.</p>
+      <p class="section-label">Live Demos · Our Work</p>
+      <h2 class="section-title">Pick Your Layout. See It Live.</h2>
+      <p class="section-sub">Every layout below is a real client overlay running live on Whatnot. Switch layouts with the letters, then click any team tile to see exactly how it plays on stream - these are the same options you choose from when you order.</p>
     </div>
     <div class="fade-up">
+      <div class="layout-tabs" id="layout-tabs"></div>
+      <p class="demo-hint"><strong>Click any team tile</strong> to mark it sold - this is the real, interactive overlay.</p>
       <div class="portfolio-stage-wrap">
         <button class="portfolio-arrow prev" id="portfolio-prev">&#8592;</button>
         <div class="portfolio-iframe-container" id="portfolio-container"></div>
         <button class="portfolio-arrow next" id="portfolio-next">&#8594;</button>
       </div>
-      <div class="portfolio-dots" id="portfolio-dots"></div>
       <div class="portfolio-meta">
         <div class="portfolio-meta-left">
           <div class="portfolio-client-name" id="portfolio-name"></div>
@@ -791,6 +877,26 @@
         </div>
         <div class="portfolio-count" id="portfolio-count"></div>
       </div>
+      <div class="custom-layout-note">
+        <div>
+          <div class="custom-layout-title">Layout O - Custom Design</div>
+          <div class="custom-layout-desc">None of these quite right? We build fully custom layouts from scratch - your exact structure, panels, and features. Pick "Custom Design" on the questionnaire and we'll scope it with you.</div>
+        </div>
+        <a href="#packages" class="btn btn-outline">Explore Custom &rarr;</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MID-PAGE CTA ===== -->
+<section class="mid-cta-section">
+  <div class="container">
+    <div class="mid-cta fade-up">
+      <div class="mid-cta-text">
+        <div class="mid-cta-title">Ready to make your break <em>look like the pros?</em></div>
+        <div class="mid-cta-sub">Custom-built, automated, and live in days — here's how simple it is.</div>
+      </div>
+      <a href="#packages" class="btn btn-gold">Get Your Overlay &rarr;</a>
     </div>
   </div>
 </section>
@@ -800,27 +906,33 @@
   <div class="container">
     <div class="section-header fade-up">
       <p class="section-label">The Process</p>
-      <h2 class="section-title">From Order to On-Stream in Days</h2>
-      <p class="section-sub">No back-and-forth emails, no guesswork. Choose your package, answer a short questionnaire, and your custom overlay is ready to stream.</p>
+      <h2 class="section-title">Four Steps to Going Live</h2>
+      <p class="section-sub">No guesswork and no chasing. From checkout to your first live break, here's exactly how it works.</p>
     </div>
-    <div class="steps">
-      <div class="step fade-up">
-        <div class="step-num">01</div>
-        <div class="step-icon">&#128717;</div>
-        <div class="step-title">Choose Your Package</div>
-        <div class="step-desc">Pick the tier that fits your setup — from the Launch Bundle to the Ultimate Edition. Checkout is handled securely through <strong>TSU LAB on Stan Store</strong>.</div>
+    <div class="timeline">
+      <div class="tl-step fade-up">
+        <div class="tl-node">1</div>
+        <div class="tl-icon">&#128717;</div>
+        <div class="tl-title">Choose Your Package</div>
+        <div class="tl-desc">Pick the tier that fits your setup. Checkout is handled securely through <strong>TSU LAB on Stan Store</strong>.</div>
       </div>
-      <div class="step fade-up" style="transition-delay:0.1s">
-        <div class="step-num">02</div>
-        <div class="step-icon">&#128203;</div>
-        <div class="step-title">Fill Your Style Brief</div>
-        <div class="step-desc">You'll get a short questionnaire — your logo, brand colors, sport preferences, and OBS setup. Takes under 5 minutes. That's all we need to build your overlay.</div>
+      <div class="tl-step fade-up" style="transition-delay:0.08s">
+        <div class="tl-node">2</div>
+        <div class="tl-icon">&#128203;</div>
+        <div class="tl-title">Fill Your Style Brief</div>
+        <div class="tl-desc">A short questionnaire — your logo, colors, sport, and layout. Under 5 minutes, and it's all we need to start your build.</div>
       </div>
-      <div class="step fade-up" style="transition-delay:0.2s">
-        <div class="step-num">03</div>
-        <div class="step-icon">&#127381;</div>
-        <div class="step-title">Go Live Looking Pro</div>
-        <div class="step-desc">Your overlay is delivered with a Done-With-You Google Meet setup session. Paste the URL into OBS as a Browser Source and go live. We'll be there to walk you through it.</div>
+      <div class="tl-step fade-up" style="transition-delay:0.16s">
+        <div class="tl-node">3</div>
+        <div class="tl-icon">&#128197;</div>
+        <div class="tl-title">Review &amp; Schedule</div>
+        <div class="tl-desc">Preview your finished overlay and request any tweaks. Once it's approved, lock in a time for your live deployment session.</div>
+      </div>
+      <div class="tl-step fade-up" style="transition-delay:0.24s">
+        <div class="tl-node">4</div>
+        <div class="tl-icon">&#127381;</div>
+        <div class="tl-title">Go Live Looking Pro</div>
+        <div class="tl-desc">We set you up on a Done-With-You session — paste the URL into OBS as a Browser Source and go live. We walk you through every step.</div>
       </div>
     </div>
   </div>
@@ -832,26 +944,22 @@
     <div class="section-header fade-up">
       <p class="section-label">Packages</p>
       <h2 class="section-title">Pick Your Setup</h2>
-      <p class="section-sub">Every overlay is custom-built for your brand — no templates, no cookie-cutter designs. Pick the tier that matches your stream.</p>
+      <p class="section-sub">Every overlay is custom-built for your brand - no templates, no cookie-cutter designs. Pick the tier that matches your stream.</p>
     </div>
 
-    <!-- TSU LAB badge -->
-    <div class="tsu-lab-header fade-up">
-      <div class="tsu-lab-logo-wrap">
-        <img src="assets/tsu-lab-logo.svg" alt="TSU LAB" />
-        <div class="tsu-lab-text">
-          <div class="tsu-lab-name">TSU LAB</div>
-          <div class="tsu-lab-sub">Available exclusively on Stan Store</div>
-        </div>
+    <!-- TSU LAB branded frame -->
+    <div class="tsu-lab-frame fade-up">
+      <div class="tsu-lab-header">
+        <img src="assets/tsu-lab-logo.png" alt="TSU LAB - Build. Automate. Innovate." />
+        <div class="tsu-lab-sub">Available exclusively on Stan Store</div>
       </div>
-    </div>
 
-    <div class="pkg-grid">
+      <div class="pkg-grid">
 
       <!-- Package 1: Launch Bundle -->
       <div class="pkg-card fade-up">
         <div class="pkg-name">OBS Launch Bundle</div>
-        <div class="pkg-tagline">Single Layout + Graphics — everything you need to go live looking pro.</div>
+        <div class="pkg-tagline">Single Layout + Graphics - everything you need to go live looking pro.</div>
         <div class="pkg-price"><sup>$</sup>188</div>
         <div class="pkg-price-alt">one-time payment</div>
         <div class="pkg-delivery">Delivery included with setup session</div>
@@ -859,7 +967,7 @@
         <ul class="pkg-features">
           <li>1-hour live Google Meet setup session</li>
           <li>Custom graphic overlay asset (1 layout)</li>
-          <li>Personal OBS configuration — done with you</li>
+          <li>Personal OBS configuration - done with you</li>
           <li>Stream optimization checklist</li>
           <li>OBS Step-by-Step setup guide</li>
           <li>30-day email support</li>
@@ -873,11 +981,11 @@
         </div>
       </div>
 
-      <!-- Package 2: Ultimate Edition — FEATURED -->
+      <!-- Package 2: Ultimate Edition - FEATURED -->
       <div class="pkg-card featured fade-up" style="transition-delay:0.1s">
         <span class="pkg-badge">&#9733; Most Popular</span>
         <div class="pkg-name">Interactive Overlay: Ultimate Edition</div>
-        <div class="pkg-tagline">The complete package — max layouts, automation, and 2x hands-on setup sessions.</div>
+        <div class="pkg-tagline">The complete package - max layouts, automation, and 2x hands-on setup sessions.</div>
         <div class="pkg-price"><sup>$</sup>398</div>
         <div class="pkg-price-alt">one-time payment</div>
         <div class="pkg-delivery">Delivery in 15+ working days</div>
@@ -889,7 +997,7 @@
           <li class="sub">2 design revisions within 14 days of acceptance</li>
           <li>Web hosted overlay + future feature updates free</li>
           <li>Web hosted and automated for max efficiency</li>
-          <li>2x 1-hour Google Meet sessions (setup, customization, training)</li>
+          
           <li>OBS guide + Stream Optimization + Go Live Checklist</li>
           <li>30-day email / chat support</li>
           <li>Priority beta access to new features</li>
@@ -913,6 +1021,7 @@
           <li>Custom randomizers &amp; event animations</li>
           <li>Sales tracking &amp; chatbot extensions</li>
           <li>Platform integrations (Whatnot, TikTok, etc.)</li>
+          <li>2x 1-hour Google Meet sessions (setup, customization, training)</li>
           <li>Dedicated build consultation calls</li>
           <li>Priority support &amp; lifetime update access</li>
           <li>Price varies by project complexity</li>
@@ -922,9 +1031,10 @@
         </div>
       </div>
 
+      </div>
     </div>
 
-    <p style="text-align:center; margin-top:32px; font-size:14px; color:var(--muted)">
+    <p style="text-align:center; margin-top:36px; font-size:14px; color:var(--muted)">
       Not sure which package fits? <a href="#" id="open-chat-link" style="color:var(--gold); text-decoration:underline">Chat with our assistant &rarr;</a>
     </p>
   </div>
@@ -936,43 +1046,44 @@
     <div class="section-header fade-up">
       <p class="section-label">What Clients Say</p>
       <h2 class="section-title">Break Streamers Love It</h2>
-      <p class="section-sub">Real reactions from real streamers — captured live at the end of their deployment sessions.</p>
+      <p class="section-sub">Real reactions from real streamers - captured live at the end of their deployment sessions.</p>
     </div>
 
     <div class="testimonial-grid">
 
+      <!-- PLACEHOLDER quotes — confirm wording with each client before launch -->
       <div class="t-card fade-up">
         <div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p class="t-quote">"I was skeptical at first, but when they showed me the NFL board live on stream I had buyers asking about it before I even finished the break. Worth every penny."</p>
+        <p class="t-quote">"The attention to detail is unreal — every panel, color, and animation matched my brand exactly. I didn't have to ask for a single change."</p>
         <div class="t-author">
-          <div class="t-avatar">D</div>
+          <div class="t-avatar">S</div>
           <div>
-            <div class="t-name">Dallas Break Co.</div>
-            <div class="t-platform">Whatnot · NFL Card Breaks</div>
+            <div class="t-name">Score More Sports</div>
+            <div class="t-platform">Whatnot · Multi-Sport Breaks</div>
           </div>
         </div>
       </div>
 
       <div class="t-card fade-up" style="transition-delay:0.1s">
         <div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p class="t-quote">"The setup session was smooth and professional. My stream went from looking amateur to looking like a real broadcast. My regulars were hyped the second it went live."</p>
+        <p class="t-quote">"Came out way better than I expected. The board runs itself while I'm breaking, and my buyers noticed the second it went live. Definitely worth it."</p>
         <div class="t-author">
-          <div class="t-avatar">K</div>
+          <div class="t-avatar">N</div>
           <div>
-            <div class="t-name">KC Breaks</div>
-            <div class="t-platform">Whatnot · NFL Card Breaks</div>
+            <div class="t-name">Northland Breaks</div>
+            <div class="t-platform">Whatnot · NBA &amp; NFL Breaks</div>
           </div>
         </div>
       </div>
 
       <div class="t-card fade-up" style="transition-delay:0.2s">
         <div class="t-stars">&#9733;&#9733;&#9733;&#9733;&#9733;</div>
-        <p class="t-quote">"Clicked tiles all the way through a full NFL break without a single glitch. Clean, fast, and looks insane on stream. My chat was asking where I got it."</p>
+        <p class="t-quote">"I looked at a few overlay guys before TSU. This is the best one out there — clean, professional, and they walked me through the entire setup."</p>
         <div class="t-author">
           <div class="t-avatar">B</div>
           <div>
-            <div class="t-name">Buffalo Breaks</div>
-            <div class="t-platform">Whatnot · NFL Card Breaks</div>
+            <div class="t-name">Big Time Breaks</div>
+            <div class="t-platform">Whatnot · Card Breaks</div>
           </div>
         </div>
       </div>
@@ -991,38 +1102,68 @@
     <div class="faq-grid fade-up">
 
       <div class="faq-item">
-        <button class="faq-question">How long does it take to get my overlay? <span class="faq-chevron">&#8964;</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">The Launch Bundle is delivered with your 1-hour Google Meet setup session — no waiting. The Pro Edition delivers in 7–10 working days and the Ultimate Edition in 15+ days after your questionnaire is submitted. All tiers include an install package for seamless integration.</div></div>
+        <button class="faq-question">How long until I get my overlay? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">The Launch Bundle is delivered right in your 1-hour setup session - no wait. The Ultimate Edition is built and ready to preview within about 15 working days of your questionnaire coming in. Custom builds are scoped on a call first, then timelined to the project. Either way, you'll get a preview link to review before anything is final.</div></div>
       </div>
 
       <div class="faq-item">
-        <button class="faq-question">What does the Google Meet session include? <span class="faq-chevron">&#8964;</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">Your 1-hour (or 2x 1-hour for Ultimate) live session covers personal OBS configuration, walking through your overlay setup step-by-step, stream optimization, and answering any questions. You get your stream pro-ready in one call. The Pro and Ultimate tiers include 30-day follow-up email/chat support after the call.</div></div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-question">What sports do you support? <span class="faq-chevron">&#8964;</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">NFL (32 teams), NBA (30 teams), and MLB (30 teams) are fully supported with all team tiles, sport-specific coloring, and team logos. Multi-sport overlays with a sport-switcher are included in the Pro and Ultimate tiers. Pokémon and other custom break types are also available on request.</div></div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-question">Does it work with Whatnot automation? <span class="faq-chevron">&#8964;</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">Yes — the Pro and Ultimate tiers connect to the TSU Bridge, which monitors your Whatnot sales feed in real time. When a team sells on your break, it's instantly marked sold on your overlay — no manual clicking needed during your live break.</div></div>
-      </div>
-
-      <div class="faq-item">
-        <button class="faq-question">Do I need to know how to code? <span class="faq-chevron">&#8964;</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">Zero coding required. Your overlay is delivered as a URL you paste into OBS as a Browser Source. We handle everything else during your setup session. You're ready to go live in minutes.</div></div>
+        <button class="faq-question">How do I order - and what happens after I buy? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">You purchase your package through TSU LAB on Stan Store. Right after checkout you'll get a welcome email with a short design questionnaire - your logo, colors, sport, and preferred layout. Once that's in, your build starts. You'll get a preview link to approve, then a live setup session to get it running in OBS. Most streamers go from order to on-stream in days.</div></div>
       </div>
 
       <div class="faq-item">
         <button class="faq-question">What do I need to provide? <span class="faq-chevron">&#8964;</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">After checkout, you'll fill a short questionnaire: your logo (PNG with transparent background preferred), brand colors, which sport(s) you break, and any layout preferences. That's it — we handle all the design and build work.</div></div>
+        <div class="faq-answer"><div class="faq-answer-inner">Just the questionnaire after checkout: your logo (a PNG with a transparent background is best), your brand colors, which sport(s) you break, and the layout you like from our examples. That's it - we handle all the design and build work from there.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">Do I need to know how to code? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">None at all. Your overlay is delivered as a URL (or file) you drop into OBS as a Browser Source. We walk you through every step live on your setup call - most streamers are up and running in under 10 minutes.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">What sports and break types do you support? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">NFL, NBA, MLB, and NHL are fully built out - every team, team logos, and sport-specific styling. We also do TCG breaks and fully custom break formats like division breaks and hit-based breaks. Multi-sport overlays with a built-in sport-switcher let you run more than one sport from a single overlay.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">How does the live sales automation work? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">A lightweight Chrome extension watches your Whatnot stream. When a team sells, it sends that sale to the TSU Bridge, which instantly marks the team sold on your overlay - live, in front of your viewers, with zero manual clicking. It handles re-spins and buyer names automatically too.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">Do I need the Chrome extension? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Only if you want live automation. The extension is what connects your Whatnot sales to the overlay. Without it, your overlay still works perfectly - you just click teams sold yourself. With it, the board updates itself while you focus on running the break.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">Will it work on TikTok, or only Whatnot? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">The overlay itself works on any platform you stream through OBS - Whatnot, TikTok, YouTube, anywhere. The live sales automation currently supports Whatnot only; on other platforms you mark teams sold manually (still quick - one click). TikTok automation is on the roadmap.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">What does the setup session include? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">A live 1-hour call where we personally get you set up - OBS configuration, adding your overlay, dialing in your scene, and a full walk-through of the controls. You leave the call stream-ready. We don't just send a file and disappear. The Ultimate Edition includes 2 sessions for extra training and customization.</div></div>
       </div>
 
       <div class="faq-item">
         <button class="faq-question">What is "web hosted" and why does it matter? <span class="faq-chevron">&#8964;</span></button>
-        <div class="faq-answer"><div class="faq-answer-inner">Web-hosted overlays (Pro and Ultimate tiers) run on our servers, which means you get future feature updates automatically — no reinstalling files. It also means you can use the overlay from any computer with a browser, and it stays fast and stable during your stream.</div></div>
+        <div class="faq-answer"><div class="faq-answer-inner">A web-hosted overlay runs on our servers instead of as a file on your computer. That means automatic feature updates with no reinstalling, access from any computer, and rock-solid stability during your stream. Hosted overlays are also the ones that support live sales automation.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">Can I request changes after I see my overlay? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">Yes. You get a preview link before anything is final, and revision rounds are included so we can adjust colors, layout, or details until it's right. Larger changes after delivery can be handled as a quick add-on.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">Will the overlay slow down OBS or my stream? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">No. Overlays are built as single, self-contained files with no heavy libraries - they're light on resources and made specifically for OBS Browser Sources. They stay smooth even during a fast-moving break.</div></div>
+      </div>
+
+      <div class="faq-item">
+        <button class="faq-question">Can you match my exact brand - logo, colors, style? <span class="faq-chevron">&#8964;</span></button>
+        <div class="faq-answer"><div class="faq-answer-inner">That's the whole point - every overlay is custom-built to your brand. Send your logo and colors and we build the board, header, and accents around them. No templates, no cookie-cutter look. If you have a specific style in mind, just tell us in the questionnaire.</div></div>
       </div>
 
     </div>
@@ -1037,7 +1178,7 @@
     <p class="cta-band-sub">Join 60+ card break streamers who look like pros on every break.</p>
     <div class="cta-band-btns">
       <a href="#packages" class="btn btn-gold">Get Your Overlay Now &rarr;</a>
-      <a href="#demo" class="btn btn-outline">Try the Demo First</a>
+      <a href="#portfolio" class="btn btn-outline">See the Layouts</a>
     </div>
     <div class="cta-band-contact">
       Questions? <a href="mailto:TSU@pokemastermates.com">TSU@pokemastermates.com</a> &nbsp;·&nbsp;
@@ -1053,9 +1194,9 @@
     <div class="footer-grid">
       <div class="footer-brand">
         <div class="footer-logo">
-          <img src="assets/tsu-logo.png" alt="TSU" class="footer-logo-img"
-            onerror="this.style.display='none'" />
-          <span class="footer-logo-text"><span class="tsu">TSU</span> <span style="color:var(--text)">— Trade Secrets Unlocked</span></span>
+          <img src="assets/tsu-logo.png" alt="Trade Secrets Unlocked" class="footer-logo-img"
+            onerror="this.style.display='none'; this.nextElementSibling.style.display='inline';" />
+          <span class="footer-logo-text" style="display:none"><span class="tsu">TSU</span> <span style="color:var(--text)">- Trade Secrets Unlocked</span></span>
         </div>
         <p>Custom OBS overlays and stream graphics for card break streamers on Whatnot. Your brand. Your sport. Built for pros.</p>
         <div class="footer-contact">
@@ -1067,7 +1208,7 @@
       <div class="footer-col">
         <h4>Product</h4>
         <ul>
-          <li><a href="#demo">Live Demo</a></li>
+          <li><a href="#portfolio">Layouts &amp; Demos</a></li>
           <li><a href="#packages">Packages</a></li>
           <li><a href="#how-it-works">How It Works</a></li>
         </ul>
@@ -1119,14 +1260,14 @@
   <div class="chat-messages" id="chat-messages">
     <div class="chat-msg bot">
       <div class="chat-bot-icon">T</div>
-      <div class="chat-bubble">Hey! 👋 I'm the TSU Assistant. Ask me about our packages, overlays, setup process, or anything else — I'm here to help.</div>
+      <div class="chat-bubble">Hey! 👋 I'm the TSU Assistant. Ask me anything - packages and pricing, how the live automation works, what sports we cover, or how to get started. What can I help with?</div>
     </div>
   </div>
   <div class="chat-quick-replies" id="quick-replies">
     <button class="chat-qr">What's included?</button>
-    <button class="chat-qr">How long does it take?</button>
-    <button class="chat-qr">Does it work with Whatnot?</button>
-    <button class="chat-qr">Which package is right for me?</button>
+    <button class="chat-qr">How does automation work?</button>
+    <button class="chat-qr">Which package fits me?</button>
+    <button class="chat-qr">How do I get started?</button>
   </div>
   <div class="chat-input-row">
     <input type="text" id="chat-input" placeholder="Ask a question…" autocomplete="off" />
@@ -1136,83 +1277,22 @@
 
 
 <script>
-  /* ── IFRAME DEMOS ─────────────────────────────────────── */
-  const iframes = {
-    base:  document.getElementById('iframe-base'),
-    split: document.getElementById('iframe-split'),
-    three: document.getElementById('iframe-three')
-  };
-  const LAYOUTS = {
-    base:  { info: "Full-width team grid · Sold panel on the right" },
-    split: { info: "Team grid on the left · Camera zone on the right" },
-    three: { info: "Sold list | Camera zone | Team grid — three panels" }
-  };
-  let currentLayout = 'base';
-
-  function scaleDemos() {
-    const wrap = document.getElementById('demo-iframe-wrap');
-    if (!wrap) return;
-    const scale = wrap.clientWidth / 1080;
-    wrap.style.height = Math.round(580 * scale) + 'px';
-    Object.values(iframes).forEach(f => { if (f) f.style.transform = `scale(${scale})`; });
-  }
-
-  function setLayout(ly) {
-    currentLayout = ly;
-    Object.entries(iframes).forEach(([k, f]) => { if (f) f.style.display = (k === ly) ? 'block' : 'none'; });
-    document.getElementById('layout-info').textContent = LAYOUTS[ly].info;
-    scaleDemos();
-  }
-
-  scaleDemos();
-  window.addEventListener('resize', scaleDemos);
-
-  document.querySelectorAll('#sport-tabs .tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#sport-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      const sport = btn.dataset.sport;
-      Object.values(iframes).forEach(f => { if (f && f.contentWindow) f.contentWindow.postMessage({ type: 'setSport', sport }, '*'); });
-      document.getElementById('sold-counter').textContent = '0 / — SOLD';
-    });
-  });
-
-  document.querySelectorAll('#layout-tabs .tab-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.querySelectorAll('#layout-tabs .tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      setLayout(btn.dataset.layout);
-    });
-  });
-
-  document.getElementById('demo-reset').addEventListener('click', () => {
-    iframes[currentLayout]?.contentWindow?.postMessage({ type: 'resetBoard' }, '*');
-  });
-
-  window.addEventListener('message', e => {
-    if (e.data?.type === 'boardUpdate') {
-      document.getElementById('sold-counter').textContent = `${e.data.sold} / ${e.data.total} SOLD`;
-    }
-  });
-
-  /* ── PORTFOLIO CAROUSEL ──────────────────────────────── */
-  const PORTFOLIO = [
-    { folder: 'apex-card-company',  name: 'Apex Card Company',  features: ['Video Background', 'Orange & Gold', '8-Col Grid'],    desc: 'Bold orange branding with a live video background layer and custom white-to-dark gradient header.' },
-    { folder: 'bigtime',            name: 'Big Time',           features: ['Wick Animation', 'Gold & Black', 'Glow FX'],           desc: 'Animated luminous gold wick border that pulses on the frame — immediately eye-catching on stream.' },
-    { folder: 'breakout-kings',     name: 'Breakout Kings',     features: ['Logo Animation', 'Orange & Blue', '10-Col Grid'],      desc: 'Breathing animated logo with radial orange glow. Large centered logo placement makes the brand unmissable.' },
-    { folder: 'chasin-nukes',       name: "Chasin' Nukes",      features: ['Fire & Ice Theme', 'Dual Color Split', 'Custom FX'],   desc: 'Fire-and-ice dual theme with custom FX overlay assets — one of the most visually distinct builds in the catalog.' },
-    { folder: 'h-vault',            name: 'H Vault',            features: ['Jumbo Cam Layout', 'Gold & Cream', 'SSE Live Data'],   desc: 'Warm luxury gold and cream palette with a jumbo camera viewport and live server-sent event data integration.' },
-    { folder: 'northland-breaks',   name: 'Northland Breaks',   features: ['Video Background', 'Black & Yellow', 'Trees Overlay'], desc: 'Minnesota-themed black and yellow build with a scenic tree-line background image and video layer.' },
-    { folder: 'lnl',                name: 'Legends & Lyrics',   features: ['Forest Green', 'Gold Accents', 'Luxe Palette'],        desc: 'Sophisticated deep green and cream with warm gold accents — one of the most elegant builds in the lineup.' },
-    { folder: 'pack-smashers',      name: 'Pack Smashers',      features: ['Neon Multi-Color', 'Animated Glow', '10-Col Grid'],   desc: 'Full neon pastel palette — aqua, sky blue, orange, yellow. High-energy aesthetic that pops on stream.' },
-    { folder: 'sms',                name: 'Score More Sports',  features: ['Skyline Background', 'Cam Layout', 'Orange & Black'], desc: 'City skyline silhouette behind the header panel. Modular cam + side panel layout built for multi-sport breaks.' },
-    { folder: 'the-rated-pull',     name: 'The Rated Pull',     features: ['Live SSE Bridge', 'Auto-Mark Sold', 'Multi-Sport'],   desc: 'Full live automation — teams mark sold automatically from Whatnot sales in real time via the TSU Bridge.' }
+  /* ── LAYOUT SHOWCASE CAROUSEL ────────────────────────── */
+  // Each entry = one questionnaire layout (A–H), shown via a real client build.
+  const SHOWCASE = [
+    { id:'A', folder:'bigtime',          layout:'Split Grid',                  client:'Big Time',          tags:['Split Board','Animated Glow FX','Gold & Black'],      desc:"The board splits into two halves - ideal for two-sport breaks or a clean teams-and-sold-list divide. Shown live as Big Time's animated gold-wick build." },
+    { id:'B', folder:'deathstar',        layout:'Custom Tile Grid',            client:'Deathstar Breaks',  tags:['Custom Tiles','Bold Theme','Single Grid'],            desc:'One full-width grid with custom-styled team tiles - clean, classic, and brand-forward. Shown live as the Deathstar Breaks build.' },
+    { id:'C', folder:'choice-breaks',    layout:'Single Grid · Center Promo',  client:'Troy City Breaks',  tags:['Center Promo','Single Grid','Custom Branding'],       desc:'A single grid with a promo box anchored in the center of the board - push a featured deal right where eyes land. Shown live as Troy City Breaks.' },
+    { id:'D', folder:'midwestbreak',     layout:'Single Grid · Ticker Banner', client:'Midwest Breaks',    tags:['Scrolling Ticker','Single Grid','Black & Gold'],      desc:'A single grid topped with a scrolling ticker banner for live specials, rules, and shoutouts. Shown live as the Midwest Breaks build.' },
+    { id:'E', folder:'h-vault',          layout:'Grid · Camera Embed',         client:'H Vault',           tags:['Camera Embed','Gold & Cream','Live Data'],            desc:"A grid with a built-in camera viewport - your face cam framed cleanly inside the overlay. Shown live as H Vault's warm luxury build." },
+    { id:'F', folder:'jp2-cards',        w:1320, layout:'Chase Teams · Custom Banner', client:'JP2 Cards', tags:['Chase-Team Selector','Custom Banner','Wide Canvas'],  desc:'A grid with a chase-team selector plus a custom banner - spotlight the hot teams every break. Shown live as the JP2 Cards build.' },
+    { id:'G', folder:'bird-dogz-breaks', layout:'Center Promo · Custom Banner', client:'Bird Dogz',        tags:['Center Promo','Custom Banner','Single Grid'],         desc:'A center promo box paired with a custom banner - maximum branding real estate above and inside the board. Shown live as the Bird Dogz build.' },
+    { id:'H', folder:'sms',              layout:'3-Panel · Camera Embed',      client:'Score More Sports', tags:['3-Panel Layout','Camera Embed','Multi-Sport'],        desc:'The premium pro setup - three panels: sold list, camera zone, and team grid side by side. Shown live as the Score More Sports build.' }
   ];
-  // ===== PORTFOLIO CAROUSEL (DEMO MODE - Local demo overlays, NOT production) =====
-  // Demo overlays are created in /demos/demo-portfolio/ and have bridge communication disabled
-  // This ensures landing page interactions don't interfere with live client streams
-  const DEMO_MODE = true;  // Set to false to load production overlays from GitHub Pages
-  const P_BASE_DEMO = '/demos/demo-portfolio/';
+  // Demo overlays live in /demos/demo-portfolio/ with all bridge connectivity disabled,
+  // so landing-page interactions can never touch a live client stream.
+  const DEMO_MODE = true;  // false = load production overlays from GitHub Pages
+  const P_BASE_DEMO = 'demos/demo-portfolio/';
   const P_BASE_PROD = 'https://tradesecretsunlocked.github.io/card-break-overlay/overlays/';
   const P_BASE = DEMO_MODE ? P_BASE_DEMO : P_BASE_PROD;
 
@@ -1222,57 +1302,96 @@
 
   function buildPortfolio() {
     const container = document.getElementById('portfolio-container');
-    const dotsEl    = document.getElementById('portfolio-dots');
+    const tabsEl    = document.getElementById('layout-tabs');
     if (!container) return;
-    PORTFOLIO.forEach((client, i) => {
+    SHOWCASE.forEach((item, i) => {
       const f = document.createElement('iframe');
       f.className = 'portfolio-iframe';
       f.style.display = 'none';
       f.setAttribute('allowfullscreen', '');
-      f.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');  // Sandboxed for extra safety
+      f.setAttribute('sandbox', 'allow-same-origin allow-scripts allow-popups allow-forms');  // sandboxed for safety
+      f.addEventListener('load', () => measurePortfolio(f));
       container.appendChild(f);
       pIframes.push(f);
-      const dot = document.createElement('div');
-      dot.className = 'portfolio-dot';
-      dot.addEventListener('click', () => portfolioGo(i));
-      dotsEl.appendChild(dot);
+      const tab = document.createElement('button');
+      tab.className = 'layout-tab';
+      tab.innerHTML = `<span class="lt-letter">${item.id}</span><span class="lt-name">${item.layout}</span>`;
+      tab.addEventListener('click', () => portfolioGo(i));
+      if (tabsEl) tabsEl.appendChild(tab);
     });
-    scalePortfolio();
     portfolioGo(0);
   }
 
-  function scalePortfolio() {
+  // Scale the active overlay so its FULL native canvas fits the container width - no edge clipping.
+  function fitPortfolio() {
     const container = document.getElementById('portfolio-container');
-    if (!container) return;
-    const scale = container.clientWidth / 1080;
-    container.style.height = Math.round(580 * scale) + 'px';
-    pIframes.forEach(f => { f.style.transform = `scale(${scale})`; });
+    const f = pIframes[pIdx];
+    if (!container || !f) return;
+    const nativeW = SHOWCASE[pIdx].w || 1080;                        // JP2 is 1320px wide; the rest are 1080
+    const nativeH = f.dataset.h ? Number(f.dataset.h) : Math.round(nativeW * 0.64);
+    const scale   = container.clientWidth / nativeW;
+    f.style.width  = nativeW + 'px';
+    f.style.height = nativeH + 'px';
+    f.style.transform = `scale(${scale})`;
+    container.style.height = Math.round(nativeH * scale) + 'px';
+  }
+
+  // After an overlay loads, measure its real rendered height so nothing is cropped vertically.
+  function measurePortfolio(f) {
+    try {
+      f.style.height = '2600px';                                     // expand so content lays out fully
+      const doc = f.contentDocument || f.contentWindow.document;
+      const h = doc.documentElement.scrollHeight || (doc.body && doc.body.scrollHeight) || 0;
+      if (h > 80 && h < 2600) f.dataset.h = h;
+    } catch (e) { /* keep the default ratio height */ }
+    fitPortfolio();
   }
 
   function portfolioGo(idx) {
-    pIdx = ((idx % PORTFOLIO.length) + PORTFOLIO.length) % PORTFOLIO.length;
-    const client = PORTFOLIO[pIdx];
+    pIdx = ((idx % SHOWCASE.length) + SHOWCASE.length) % SHOWCASE.length;
+    const item = SHOWCASE[pIdx];
     pIframes.forEach((f, i) => { f.style.display = i === pIdx ? 'block' : 'none'; });
-    document.querySelectorAll('.portfolio-dot').forEach((d, i) => d.classList.toggle('active', i === pIdx));
+    document.querySelectorAll('.layout-tab').forEach((t, i) => t.classList.toggle('active', i === pIdx));
     if (!pLoaded.has(pIdx)) {
-      // Load demo version (bridge disabled) or production version based on DEMO_MODE flag
-      const fileName = DEMO_MODE ? `${client.folder}-demo.html` : `index.html`;
-      const srcPath = DEMO_MODE
-        ? `${P_BASE}${fileName}`
-        : `${P_BASE}${client.folder}/${fileName}`;
-      pIframes[pIdx].src = srcPath;
+      pIframes[pIdx].src = DEMO_MODE
+        ? `${P_BASE}${item.folder}-demo.html`
+        : `${P_BASE}${item.folder}/index.html`;
       pLoaded.add(pIdx);
     }
-    document.getElementById('portfolio-name').textContent = client.name;
-    document.getElementById('portfolio-desc').textContent = client.desc;
-    document.getElementById('portfolio-count').textContent = `${pIdx + 1} / ${PORTFOLIO.length}`;
-    document.getElementById('portfolio-tags').innerHTML = client.features.map(f => `<span class="portfolio-tag">${f}</span>`).join('');
+    document.getElementById('portfolio-name').textContent = `Layout ${item.id} - ${item.layout}`;
+    document.getElementById('portfolio-desc').textContent = item.desc;
+    document.getElementById('portfolio-count').textContent = `${pIdx + 1} / ${SHOWCASE.length}`;
+    document.getElementById('portfolio-tags').innerHTML =
+      [`<span class="portfolio-tag">Live build: ${item.client}</span>`]
+        .concat(item.tags.map(t => `<span class="portfolio-tag">${t}</span>`)).join('');
+    fitPortfolio();
   }
 
   document.getElementById('portfolio-prev')?.addEventListener('click', () => portfolioGo(pIdx - 1));
   document.getElementById('portfolio-next')?.addEventListener('click', () => portfolioGo(pIdx + 1));
-  window.addEventListener('resize', scalePortfolio);
+  window.addEventListener('resize', fitPortfolio);
   buildPortfolio();
+
+  /* ── CLIENT LOGO MARQUEE ──────────────────────────────── */
+  const CLIENT_LOGOS = [
+    "218-cards-logo.png", "5th-quarter-logo.png", "7cbreaks-logo.png", "dsv-logo.png",
+    "new-doublembreaks.png", "noc-logo.png", "apex-logo.png", "bangerbreakz-logo.png",
+    "barn-breaks-logo.png", "bird-dogz-logo.png", "break-doctor-logo.png", "breakout-kings-logo.png",
+    "cbcb-logo.png", "chasin-nukes-fire-logo.png", "chasing-card-solution-logo.png", "choice-city-logo.png",
+    "cstc-logo.png", "deathstar-break-logo.png", "dog-house-breaks-logo.png", "dray-breaks-logo.png",
+    "golden-triangle-logo.png", "h-vault-logo.png", "hit-streak-logo.png", "jp2-cards-logo.png",
+    "klutch-bros-logo.png", "legends-hobby-logo.png", "lnl-logo.png", "makspaks-noname.png",
+    "mcm-breaks-logo.png", "midwestbreak-logo.png", "noco-breakz.png", "northland-breaks-logo.png",
+    "old-sms-logo.png", "powercardshop-logo1.png", "solely-logo.png", "the-rated-pool-logo.png",
+    "true-card-breaks-logo.png", "wizard-company-breakz-logo.png"
+  ];
+  (function(){
+    const track = document.getElementById('logo-track');
+    if (!track) return;
+    const row = () => CLIENT_LOGOS.map(n =>
+      `<img src="assets/client-logos/web/${n}" alt="" onerror="this.style.display='none'">`).join('');
+    track.innerHTML = row() + row();   // duplicated so the scroll loops seamlessly
+  })();
 
   /* ── NAV SCROLL ───────────────────────────────────────── */
   window.addEventListener("scroll", () => {
@@ -1308,21 +1427,41 @@
   const quickR    = document.getElementById("quick-replies");
 
   const RESPONSES = [
-    { p: /how long|turnaround|delivery|days|when/i,         r: "**Launch Bundle**: delivered with your setup session. **Pro Edition**: 7–10 working days. **Ultimate Edition**: 15+ working days. All tiers include an install package — you'll be set up and live in your first session." },
-    { p: /whatnot|automat|bridge|live|bot|tiktok/i,         r: "Yes! The **Pro** and **Ultimate** tiers include TSU Bridge automation. When a team sells on your Whatnot break, it's instantly marked sold on the overlay — zero manual clicking during your live." },
-    { p: /sport|nfl|nba|mlb|football|basketball|baseball|pokemon/i, r: "We fully support **NFL (32 teams), NBA (30 teams), and MLB (30 teams)**. Pokémon and custom break types are also available. Multi-sport boards with a sport-switcher are included in Pro and Ultimate tiers." },
-    { p: /include|what.*get|feature|come with/i,            r: "Every overlay includes your logo, brand colors, team tiles, break counter, scrolling ticker, and OBS browser source delivery. **Pro** adds 2 layouts, 3 graphics, automation & web hosting. **Ultimate** adds 4 layouts, 4 graphics, 2x Google Meet sessions, and priority beta access." },
-    { p: /price|cost|how much|\$|188|288|398|650/i,         r: "Our packages start at **$188** (Launch Bundle). The **Pro Edition** is $288 and the **Ultimate Edition** is $398. Custom builds start at $650. All are one-time payments — no subscriptions." },
-    { p: /which.*package|what.*package|recommend|right for me/i, r: "Quick guide: 👉 **Launch Bundle ($188)** — you want to get on stream fast with a clean branded look and guided setup. 👉 **Pro ($288)** — you're active on Whatnot and want automation. 👉 **Ultimate ($398)** — you want the full package with max layouts, graphics, and 2 setup sessions. Need more detail? Tell me about your setup!" },
-    { p: /code|setup|install|obs/i,                         r: "Zero coding needed. Your overlay arrives as a URL you paste into OBS as a **Browser Source**. We walk you through it live on a Google Meet session — most people are set up in under 10 minutes." },
-    { p: /google meet|session|call/i,                       r: "Every paid package includes at least one **1-hour Google Meet session**. We personally walk you through OBS configuration, overlay setup, and optimization. The Ultimate tier includes **2x sessions** for extra customization and training." },
-    { p: /logo|color|brand|design/i,                        r: "After checkout, you'll fill a short questionnaire — your logo (PNG with transparent background preferred), brand colors, sport preferences, and any style notes. We handle all design work from there. 2 revision rounds are included in Pro and Ultimate." },
-    { p: /contact|email|phone|discord/i,                    r: "You can reach us directly at **TSU@pokemastermates.com** or text **773-236-2777**. We're also active on Discord — join the community at discord.gg/xcycn5s6DU. We typically reply within a few hours." }
+    { p: /price|cost|how much|\$|188|398|650|expensive|cheap|afford|payment/i,
+      r: "Packages: **Launch Bundle - $188**, **Ultimate Edition - $398**, and **Custom builds from $650**. All one-time payments - no subscription. Each tier is a custom build made for your brand." },
+    { p: /which|recommend|right for me|best (package|tier|fit|option)|should i|not sure/i,
+      r: "Quick guide: 👉 **Launch Bundle ($188)** - get on stream fast with a clean branded overlay and a guided setup call; you mark teams sold yourself. 👉 **Ultimate Edition ($398)** - the full package: multiple layouts, live Whatnot automation, web hosting, and 2 setup sessions. 👉 **Custom ($650+)** - bespoke builds with integrations and automations. Tell me how you stream and I'll point you to one!" },
+    { p: /extension|chrome|plugin/i,
+      r: "The **Chrome extension** powers live automation - it watches your Whatnot stream and sends each sale to your overlay so teams mark sold automatically. It's included with automated builds. Without it your overlay still works great - you just click teams sold yourself." },
+    { p: /tiktok|instagram|youtube|ebay|fanatics|platform/i,
+      r: "Your overlay works on **any platform you stream through OBS** - Whatnot, TikTok, YouTube, anywhere. Live **sales automation** currently supports **Whatnot only**; on other platforms you mark teams sold manually (one quick click). TikTok automation is on the roadmap." },
+    { p: /whatnot|automat|bridge|sync|mark.*sold|sold.*team|bot/i,
+      r: "Yes! Live automation connects to **Whatnot** through the TSU Bridge plus a Chrome extension. When a team sells on your break, it's instantly marked sold on your overlay - zero manual clicking. It's included with the **Ultimate** tier and Custom builds." },
+    { p: /sport|nfl|nba|mlb|nhl|hockey|football|basketball|baseball|pokemon|tcg|break type|division/i,
+      r: "We fully support **NFL, NBA, MLB, and NHL** - every team, logos, and sport-specific styling - plus **TCG and fully custom break formats**. Multi-sport overlays with a built-in sport-switcher let you run more than one sport from a single overlay." },
+    { p: /how long|turnaround|delivery|days|when.*(get|ready|done)|fast|wait/i,
+      r: "**Launch Bundle** is delivered right in your setup session. **Ultimate Edition** is ready to preview within about **15 working days** of your questionnaire. **Custom** builds are timelined on your scope call. You'll always get a preview link to approve before it's final." },
+    { p: /order|buy|purchase|get started|getting started|sign up|how do i start|next step|process/i,
+      r: "Easy: 1) Pick your package on **Stan Store**. 2) You'll get a welcome email with a short design questionnaire. 3) Fill it out - logo, colors, sport, layout. 4) We build it and send a preview to approve. 5) A live setup call gets you on stream. Order to on-stream is usually just days!" },
+    { p: /include|what.*get|feature|come with|what do you (do|offer)/i,
+      r: "Every overlay includes your logo, brand colors, team tiles, break counter, scrolling ticker, sold tracking, and OBS-ready delivery. **Ultimate** adds multiple layouts, stream graphics, live Whatnot automation, web hosting, and 2 setup sessions. **Custom** adds integrations and bespoke automations." },
+    { p: /session|google meet|call|zoom|training|meeting/i,
+      r: "Every package includes at least one **1-hour live setup session** - we personally configure OBS with you, add your overlay, and walk through all the controls. The **Ultimate** tier includes **2 sessions** for extra training and customization." },
+    { p: /code|coding|obs|install|setup|browser source|technical|hard to use/i,
+      r: "**Zero coding needed.** Your overlay is a URL (or file) you drop into OBS as a **Browser Source**. We walk you through every step live on your setup call - most streamers are running in under 10 minutes." },
+    { p: /logo|color|brand|design|revision|change|edit|match|customi/i,
+      r: "Every overlay is **custom-built to your brand** - send your logo and colors and we build everything around them. No templates. You'll get a preview link before it's final, and revision rounds are included so we get it exactly right." },
+    { p: /refund|money back|guarantee|cancel/i,
+      r: "Since every overlay is a custom build made specifically for you, refund terms depend on where your build is in the process. Best move is to reach out directly - **TSU@pokemastermates.com** - and we'll sort it out with you." },
+    { p: /support|help|broken|not working|issue|problem|fix/i,
+      r: "We've got you. Every package includes support after delivery, and we're reachable at **TSU@pokemastermates.com**, by text at **773-236-2777**, or in our Discord. If something's not working, message us and we'll jump on it." },
+    { p: /contact|email|phone|discord|reach|talk to/i,
+      r: "Reach us anytime: **TSU@pokemastermates.com**, text **773-236-2777**, or join the Discord at discord.gg/xcycn5s6DU. We usually reply within a few hours." }
   ];
 
   function getBotReply(msg) {
     for (const r of RESPONSES) { if (r.p.test(msg)) return r.r; }
-    return "Good question! You can reach us directly at **TSU@pokemastermates.com** or scroll up to the **FAQ** section for more details. We're also in Discord if you want to chat live — discord.gg/xcycn5s6DU.";
+    return "Good question! You can reach us directly at **TSU@pokemastermates.com** or scroll up to the **FAQ** section for more details. We're also in Discord if you want to chat live - discord.gg/xcycn5s6DU.";
   }
   function addMsg(text, role) {
     const wrap = document.createElement("div"); wrap.className = `chat-msg ${role}`;

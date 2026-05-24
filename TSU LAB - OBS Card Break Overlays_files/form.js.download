@@ -1,0 +1,460 @@
+(function () {
+  if (window.__POPPY_LANDING_PAGE_FORM_RUNTIME_INITIALIZED__) {
+    return;
+  }
+
+  window.__POPPY_LANDING_PAGE_FORM_RUNTIME_INITIALIZED__ = true;
+
+  var FORM_SELECTOR = 'form[data-poppy-form="true"]';
+  var STATUS_ATTRIBUTE = 'data-poppy-form-status';
+  var HONEYPOT_NAME = 'poppy_website';
+  var SUCCESS_REDIRECT_ATTRIBUTE = 'data-poppy-form-success-redirect';
+  var STYLE_ID = 'poppy-landing-page-form-styles';
+  var LOADING_CLASS = 'poppy-form-submit-loading';
+  var HONEYPOT_CLASS = 'poppy-form-honeypot';
+  var STATUS_CLASS = 'poppy-form-status';
+
+  function getAbTestAttribution(config) {
+    var configSplitId = cleanText(config && config.splitId);
+    var configVariantNodeId = cleanText(config && config.variantNodeId);
+
+    if (configSplitId || configVariantNodeId) {
+      return {
+        splitId: configSplitId || undefined,
+        variantNodeId: configVariantNodeId || undefined,
+      };
+    }
+
+    try {
+      var searchParams = new URLSearchParams(window.location.search);
+      var splitId = cleanText(searchParams.get('splitId'));
+      var variantNodeId = cleanText(searchParams.get('variantNodeId'));
+
+      return {
+        splitId: splitId || undefined,
+        variantNodeId: variantNodeId || undefined,
+      };
+    } catch (error) {
+      return {
+        splitId: undefined,
+        variantNodeId: undefined,
+      };
+    }
+  }
+
+  function injectStyles() {
+    if (document.getElementById(STYLE_ID)) {
+      return;
+    }
+
+    var style = document.createElement('style');
+    style.id = STYLE_ID;
+    style.textContent =
+      '.' +
+      STATUS_CLASS +
+      '{display:none;margin-top:12px;font:500 14px/1.5 system-ui,sans-serif;}' +
+      '.' +
+      STATUS_CLASS +
+      '[data-state="success"]{display:block;color:#047857;}' +
+      '.' +
+      STATUS_CLASS +
+      '[data-state="error"]{display:block;color:#b91c1c;}' +
+      '.' +
+      LOADING_CLASS +
+      '{opacity:0.7;cursor:wait !important;}' +
+      '.' +
+      HONEYPOT_CLASS +
+      '{position:absolute !important;left:-9999px !important;top:auto !important;width:1px !important;height:1px !important;opacity:0 !important;pointer-events:none !important;}';
+    document.head.appendChild(style);
+  }
+
+  function ensureHoneypotField(form) {
+    var existingField = form.querySelector('input[name="' + HONEYPOT_NAME + '"]');
+
+    if (existingField) {
+      return existingField;
+    }
+
+    var honeypotField = document.createElement('input');
+    honeypotField.type = 'text';
+    honeypotField.name = HONEYPOT_NAME;
+    honeypotField.className = HONEYPOT_CLASS;
+    honeypotField.tabIndex = -1;
+    honeypotField.autocomplete = 'off';
+    honeypotField.setAttribute('aria-hidden', 'true');
+    form.appendChild(honeypotField);
+
+    return honeypotField;
+  }
+
+  function cleanText(value) {
+    return (value || '').replace(/\s+/g, ' ').trim();
+  }
+
+  function getFieldLabel(element) {
+    if (element.labels && element.labels.length > 0) {
+      return cleanText(element.labels[0].textContent);
+    }
+
+    var ariaLabel = cleanText(element.getAttribute('aria-label'));
+    if (ariaLabel) {
+      return ariaLabel;
+    }
+
+    var placeholder = cleanText(element.getAttribute('placeholder'));
+    if (placeholder) {
+      return placeholder;
+    }
+
+    return undefined;
+  }
+
+  function isSupportedField(element) {
+    if (!element || !element.name || element.disabled) {
+      return false;
+    }
+
+    var tagName = element.tagName.toLowerCase();
+
+    if (tagName !== 'input' && tagName !== 'textarea' && tagName !== 'select') {
+      return false;
+    }
+
+    if (element.name === HONEYPOT_NAME) {
+      return false;
+    }
+
+    if (tagName === 'input') {
+      var inputType = (element.type || 'text').toLowerCase();
+      return (
+        inputType !== 'button' &&
+        inputType !== 'submit' &&
+        inputType !== 'reset' &&
+        inputType !== 'image' &&
+        inputType !== 'file' &&
+        inputType !== 'password' &&
+        inputType !== 'hidden'
+      );
+    }
+
+    return true;
+  }
+
+  function getFieldValue(element) {
+    var tagName = element.tagName.toLowerCase();
+
+    if (tagName === 'input') {
+      var inputType = (element.type || 'text').toLowerCase();
+
+      if ((inputType === 'checkbox' || inputType === 'radio') && !element.checked) {
+        return '';
+      }
+
+      return cleanText(element.value);
+    }
+
+    if (tagName === 'select' && element.multiple) {
+      var selectedValues = [];
+      var options = element.options || [];
+
+      for (var optionIndex = 0; optionIndex < options.length; optionIndex += 1) {
+        if (options[optionIndex].selected) {
+          selectedValues.push(cleanText(options[optionIndex].value));
+        }
+      }
+
+      return selectedValues.filter(Boolean).join(', ');
+    }
+
+    return cleanText(element.value);
+  }
+
+  function serializeForm(form) {
+    var fields = [];
+    var elements = form.elements || [];
+
+    for (var index = 0; index < elements.length; index += 1) {
+      var element = elements[index];
+
+      if (!isSupportedField(element)) {
+        continue;
+      }
+
+      var value = getFieldValue(element);
+
+      if (!value) {
+        continue;
+      }
+
+      fields.push({
+        name: cleanText(element.name),
+        label: getFieldLabel(element),
+        value: value,
+      });
+    }
+
+    return fields;
+  }
+
+  function getFormId(form) {
+    return cleanText(form.getAttribute('data-poppy-form-id')) || cleanText(form.id) || undefined;
+  }
+
+  function getOrCreateStatusElement(form) {
+    var existingElement = form.querySelector('[' + STATUS_ATTRIBUTE + '="true"]');
+
+    if (existingElement) {
+      existingElement.classList.add(STATUS_CLASS);
+      return existingElement;
+    }
+
+    var adjacentStatusElement = form.nextElementSibling;
+
+    if (adjacentStatusElement && adjacentStatusElement.getAttribute(STATUS_ATTRIBUTE) === 'true') {
+      adjacentStatusElement.classList.add(STATUS_CLASS);
+      return adjacentStatusElement;
+    }
+
+    var statusElement = document.createElement('div');
+    statusElement.className = STATUS_CLASS;
+    statusElement.setAttribute(STATUS_ATTRIBUTE, 'true');
+    statusElement.setAttribute('role', 'status');
+    statusElement.setAttribute('aria-live', 'polite');
+    form.insertAdjacentElement('afterend', statusElement);
+
+    return statusElement;
+  }
+
+  function setStatus(statusElement, state, message) {
+    if (!statusElement) {
+      return;
+    }
+
+    if (!message) {
+      statusElement.removeAttribute('data-state');
+      statusElement.textContent = '';
+      statusElement.style.display = 'none';
+      return;
+    }
+
+    statusElement.setAttribute('data-state', state);
+    statusElement.textContent = message;
+    statusElement.style.display = 'block';
+  }
+
+  function getSubmitControl(form) {
+    return form.querySelector('button[type="submit"], input[type="submit"], button:not([type])');
+  }
+
+  function isSubmitControl(element) {
+    if (!element || !element.tagName) {
+      return false;
+    }
+
+    var tagName = element.tagName.toLowerCase();
+
+    if (tagName === 'button') {
+      var buttonType = (element.getAttribute('type') || '').toLowerCase();
+      return buttonType === '' || buttonType === 'submit';
+    }
+
+    if (tagName === 'input') {
+      return (element.getAttribute('type') || '').toLowerCase() === 'submit';
+    }
+
+    return false;
+  }
+
+  function findClosestSubmitControl(target) {
+    if (!target || typeof target.closest !== 'function') {
+      return null;
+    }
+
+    var closestControl = target.closest('button, input');
+
+    return isSubmitControl(closestControl) ? closestControl : null;
+  }
+
+  function getEventSubmitter(event, form) {
+    if (event && event.submitter && isSubmitControl(event.submitter)) {
+      return event.submitter;
+    }
+
+    if (form.__poppyLastSubmitter && isSubmitControl(form.__poppyLastSubmitter)) {
+      return form.__poppyLastSubmitter;
+    }
+
+    return getSubmitControl(form);
+  }
+
+  function getSuccessRedirectPath(submitControl) {
+    if (!submitControl || typeof submitControl.getAttribute !== 'function') {
+      return '';
+    }
+
+    return cleanText(submitControl.getAttribute(SUCCESS_REDIRECT_ATTRIBUTE));
+  }
+
+  function navigateToRedirectPath(redirectPath) {
+    if (typeof window.__POPPY_LANDING_PAGE_FORM_NAVIGATE__ === 'function') {
+      window.__POPPY_LANDING_PAGE_FORM_NAVIGATE__(redirectPath);
+      return;
+    }
+
+    window.location.assign(redirectPath);
+  }
+
+  function setSubmitControlLoading(submitControl, isLoading) {
+    if (!submitControl) {
+      return;
+    }
+
+    if (!submitControl.dataset.poppyOriginalLabel) {
+      submitControl.dataset.poppyOriginalLabel =
+        submitControl.tagName.toLowerCase() === 'input'
+          ? submitControl.value
+          : submitControl.textContent;
+    }
+
+    submitControl.disabled = isLoading;
+    submitControl.classList.toggle(LOADING_CLASS, isLoading);
+
+    if (submitControl.tagName.toLowerCase() === 'input') {
+      submitControl.value = isLoading
+        ? 'Sending...'
+        : submitControl.dataset.poppyOriginalLabel || submitControl.value;
+      return;
+    }
+
+    submitControl.textContent = isLoading
+      ? 'Sending...'
+      : submitControl.dataset.poppyOriginalLabel || submitControl.textContent;
+  }
+
+  async function handleSubmit(event, form, config) {
+    event.preventDefault();
+
+    var fields = serializeForm(form);
+    var statusElement = getOrCreateStatusElement(form);
+    var submitControl = getEventSubmitter(event, form);
+    var honeypotField = ensureHoneypotField(form);
+    var successRedirectPath = getSuccessRedirectPath(submitControl);
+
+    setStatus(statusElement, '', '');
+
+    if (!fields.length) {
+      setStatus(statusElement, 'error', 'Please complete at least one form field.');
+      return;
+    }
+
+    setSubmitControlLoading(submitControl, true);
+
+    try {
+      var response = await fetch('/api/landing-page/form-submit', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          landingPageId: config.landingPageId,
+          nodeId: config.nodeId,
+          formId: getFormId(form),
+          splitId: getAbTestAttribution(config).splitId,
+          variantNodeId: getAbTestAttribution(config).variantNodeId,
+          pageUrl: window.location.href,
+          honeypot: honeypotField ? honeypotField.value : '',
+          fields: fields,
+        }),
+      });
+
+      var responseData = null;
+
+      try {
+        responseData = await response.json();
+      } catch (jsonError) {
+        responseData = null;
+      }
+
+      if (!response.ok || !responseData || responseData.success !== true) {
+        throw new Error(
+          (responseData && responseData.error) ||
+            'Something went wrong while submitting the form. Please try again.'
+        );
+      }
+
+      form.reset();
+
+      if (honeypotField) {
+        honeypotField.value = '';
+      }
+
+      if (successRedirectPath) {
+        navigateToRedirectPath(successRedirectPath);
+        return;
+      }
+
+      setStatus(
+        statusElement,
+        'success',
+        cleanText(form.getAttribute('data-poppy-success-message')) ||
+          'Thanks! Your submission has been sent.'
+      );
+    } catch (error) {
+      setStatus(
+        statusElement,
+        'error',
+        cleanText(form.getAttribute('data-poppy-error-message')) ||
+          (error && error.message) ||
+          'Something went wrong while submitting the form. Please try again.'
+      );
+    } finally {
+      form.__poppyLastSubmitter = null;
+      setSubmitControlLoading(submitControl, false);
+    }
+  }
+
+  function bindForm(form, config) {
+    if (!form || form.dataset.poppyFormBound === 'true') {
+      return;
+    }
+
+    form.dataset.poppyFormBound = 'true';
+    ensureHoneypotField(form);
+
+    form.addEventListener('click', function (event) {
+      var submitter = findClosestSubmitControl(event.target);
+
+      if (submitter && form.contains(submitter)) {
+        form.__poppyLastSubmitter = submitter;
+      }
+    });
+
+    form.addEventListener('submit', function (event) {
+      handleSubmit(event, form, config);
+    });
+  }
+
+  function init() {
+    var config = window.__POPPY_LANDING_PAGE_FORM_CONFIG__;
+
+    if (!config || !config.landingPageId || !config.nodeId) {
+      return;
+    }
+
+    injectStyles();
+
+    var forms = document.querySelectorAll(FORM_SELECTOR);
+
+    for (var index = 0; index < forms.length; index += 1) {
+      bindForm(forms[index], config);
+    }
+  }
+
+  window.__POPPY_LANDING_PAGE_FORM_INIT__ = init;
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init, { once: true });
+  } else {
+    init();
+  }
+})();

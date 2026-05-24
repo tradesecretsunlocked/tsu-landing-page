@@ -1,6 +1,31 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+  <base href="https://tradesecretsunlocked.github.io/card-break-overlay/overlays/bigtime/">
+  <!-- ===== DEMO MODE GUARD — neutralizes all live bridge connectivity ===== -->
+  <script>
+  (function(){
+    var BLOCK = /bridge\.tradesecretsunlocked\.com|onrender\.com/i;
+    try {
+      window.EventSource = function(){
+        return { close:function(){}, addEventListener:function(){}, removeEventListener:function(){},
+                 dispatchEvent:function(){return false;}, onmessage:null, onerror:null, onopen:null,
+                 readyState:2, url:'' };
+      };
+    } catch(e){}
+    var realFetch = window.fetch;
+    if (realFetch) window.fetch = function(u){
+      try { if (BLOCK.test(String(u))) return Promise.resolve(new Response('{}', {status:200, headers:{'Content-Type':'application/json'}})); } catch(e){}
+      return realFetch.apply(this, arguments);
+    };
+    try {
+      var rOpen = XMLHttpRequest.prototype.open, rSend = XMLHttpRequest.prototype.send;
+      XMLHttpRequest.prototype.open = function(m,u){ this.__demoBlock = BLOCK.test(String(u)); return rOpen.apply(this, arguments); };
+      XMLHttpRequest.prototype.send = function(){ if (this.__demoBlock) return; return rSend.apply(this, arguments); };
+    } catch(e){}
+  })();
+  </script>
+
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=1080, initial-scale=1.0" />
   <title>[DEMO] Big Time — Multi-Sport Break Overlay</title>
@@ -1947,14 +1972,6 @@ body.division-board-mode .division-grid .team.sold::after{
   </style>
 </head>
 <body data-sport="NFL">
-  <!-- ===== DEMO MODE BANNER ===== -->
-  <div style="position: fixed; top: 0; left: 0; right: 0; background: #ff6b00; color: white; padding: 8px; text-align: center; font-weight: bold; z-index: 99999; font-family: Arial, sans-serif;">
-    🎬 DEMO MODE – This is a preview. Not connected to live client streams.
-  </div>
-  <style>
-    body { padding-top: 36px !important; }
-  </style>
-
   <div class="overlay">
        <div class="header ">
       <div class="brand">
@@ -2972,7 +2989,7 @@ const BREAK_TYPES = {
       },
       'WESTERN': {
         'NORTHWEST': [
-          ['DEN','nuggets.png','Nuggets'],['MIN','timberwolves.png','Timberwolves'],['OKC','thunder.png','Thunder'],['POR','trail-blazers.png','Trail Blazers'],['UTA','jazz.png','Jazz']
+          ['DEN','nuggets.png','Nuggets'],['MIN','timberwolves.png','Timberwolves'],['OKC','thunder.png','Thunder'],['POR','blazers.png','Trail Blazers'],['UTA','jazz.png','Jazz']
         ],
         'PACIFIC': [
           ['GSW','warriors.png','Warriors'],['LAC','clippers.png','Clippers'],['LAL','lakers.png','Lakers'],['PHX','suns.png','Suns'],['SAC','kings.png','Kings']
@@ -4326,18 +4343,23 @@ function initSSE(){
   }
 }
 
-async function bridgePost(payload) {
-    // DEMO MODE: Bridge posting disabled - local interactions only
-    return Promise.resolve();
-  },
+async function bridgePost(payload){
+  if (!automationEnabled()) return;
+  const base = getBridgeUrl();
+  const key = getBridgeKey();
+  await fetch(`${base}/events`, {
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      ...(key ? { 'x-bridge-key': key } : {})
+    },
     body: JSON.stringify(payload)
   }).catch(() => {});
 }
 function bridgePostSafe(payload){
   try{ bridgePost(payload); }catch(_){}
 }
-function // DEMO MODE: Bridge warmup disabled
-    // bridgeWarmup();{
+function bridgeWarmup(extra = {}){
   return bridgePost({
     type:'overlay_warmup',
     overlay:'big-time',
@@ -4349,8 +4371,7 @@ function // DEMO MODE: Bridge warmup disabled
   });
 }
 function bridgeWarmupSafe(){
-  try{ // DEMO MODE: Bridge warmup disabled
-    // bridgeWarmup(); }catch(_){}
+  try{ bridgeWarmup(); }catch(_){}
 }
 
 /* =========================
@@ -4663,8 +4684,8 @@ function bindEditPlayerToggle(){
   const panel = document.querySelector('.list-panel.wick');
   const title = panel && panel.querySelector('.list-panel-title');
   if (!title) return;
-  // restore saved state (default: visible)
-  if (localStorage.getItem('bigtime.editPlayerVisible') === '0')
+  // restore saved state (default: hidden)
+  if (localStorage.getItem('bigtime.editPlayerVisible') !== '1')
     panel.classList.add('edit-hidden');
   title.addEventListener('click', () => {
     const hidden = panel.classList.toggle('edit-hidden');
