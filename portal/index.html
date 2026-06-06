@@ -69,7 +69,7 @@
   .bb{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px}
   .msg{max-width:82%;padding:10px 13px;border-radius:12px;font-size:13px}.msg.bot{background:var(--bg3);border:1px solid var(--border);align-self:flex-start;border-bottom-left-radius:3px}.msg.user{background:var(--navy);border:1px solid var(--border-gold);align-self:flex-end;border-bottom-right-radius:3px}
   .chips{display:flex;gap:8px;flex-wrap:wrap;padding:12px;border-top:1px solid var(--border);background:var(--bg2)}
-  .chip{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:18px;font-size:12px}.chip:hover{border-color:var(--border-gold)}
+  .chip{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:18px;font-size:12px}.chip:hover{border-color:var(--border-gold)}.chip:disabled{opacity:.45;cursor:default}.btn{background:var(--navy);color:#fff;padding:9px 14px;border-radius:8px;font-weight:600;font-size:13px;border:1px solid var(--border-gold)}.btn:hover{background:var(--navy-light)}.btn.gold{background:var(--gold);color:#0a0a0a;border:none}.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
   .err{color:var(--red);font-size:13px;padding:10px}
   @media(max-width:840px){.kpis{grid-template-columns:1fr 1fr}.sidebar{display:none}}
 </style>
@@ -116,9 +116,12 @@
           </div>
           <div class="fin" id="fin"></div>
         </div>
-        <div class="card"><h3>Breaks — profit by break</h3>
+        <div class="card">
+          <div class="row-between" style="margin:0 0 8px"><h3 style="margin:0">Breaks — profit by break</h3>
+            <div class="mini">Show <select id="pageSize" class="ci" style="width:70px"><option>10</option><option>25</option><option>50</option><option value="9999">All</option></select></div></div>
           <table><thead><tr><th>Started</th><th>Sport</th><th style="text-align:right">Sales</th><th style="text-align:right">Gross</th><th style="text-align:right">Your cost</th><th style="text-align:right">Profit</th><th style="text-align:right">ROI</th></tr></thead>
           <tbody id="breaks"></tbody></table>
+          <div class="row-between" id="breaksPager" style="margin:10px 0 0"></div>
         </div>
         <div class="card"><h3>Top buyers</h3><div id="buyers"></div></div>
       </div>
@@ -128,7 +131,11 @@
         <div class="card"><h3>Overlay connection</h3><div id="conn"></div></div>
       </div>
 
-      <div class="page" id="billing"><div class="card"><h3>Subscription</h3><div id="bill"></div></div></div>
+      <div class="page" id="billing">
+        <div class="card"><h3>Your subscription</h3><div id="bill"></div></div>
+        <div class="card"><h3>Plans</h3><div class="mini" style="margin-bottom:8px">Choose a plan to request a change — we'll confirm by email. No charge happens here.</div><div id="plans"></div></div>
+        <div class="card"><h3>Invoices</h3><div id="invoices"></div></div>
+      </div>
 
       <div class="page" id="help">
         <div class="bot">
@@ -235,13 +242,20 @@ async function loadBuyers() {
   const max = top[0] ? top[0][1] : 1;
   $('#buyers').innerHTML = top.map(([b, v]) => `<div style="display:flex;align-items:center;gap:10px;margin:9px 0"><div class="muted" style="width:130px;font-size:12px">${b}</div><div style="flex:1;height:9px;background:var(--bg3);border-radius:6px;overflow:hidden"><div style="height:100%;width:${(v/max*100).toFixed(0)}%;background:linear-gradient(90deg,var(--navy-light),var(--gold))"></div></div><div style="width:70px;text-align:right;font-weight:600">${fmt(v)}</div></div>`).join('') || '<div class="mini">No sales in this range.</div>';
 }
+let breakPage = 0, breakPageSize = 10;
 async function loadBreaks() {
-  const { data } = await sb.from('v_break_pnl').select('*').eq('bridge_key', KEY).order('started_at', { ascending: false }).limit(60);
+  const { data } = await sb.from('v_break_pnl').select('*').eq('bridge_key', KEY).order('started_at', { ascending: false }).limit(500);
   breaks = (data || []).map(b => ({ ...b, started_at: (b.started_at || '').slice(0, 10), cost: b.cost == null ? '' : Number(b.cost) }));
+  breakPage = 0;
+  const ps = $('#pageSize'); if (ps) ps.onchange = e => { breakPageSize = +e.target.value; breakPage = 0; renderBreaks(); };
   renderBreaks();
 }
 function renderBreaks() {
-  $('#breaks').innerHTML = breaks.map((b, i) => {
+  const total = breaks.length, pages = Math.max(1, Math.ceil(total / breakPageSize));
+  if (breakPage >= pages) breakPage = pages - 1;
+  const startIdx = breakPage * breakPageSize, slice = breaks.slice(startIdx, startIdx + breakPageSize);
+  $('#breaks').innerHTML = slice.map((b, j) => {
+    const i = startIdx + j;
     const gross = Number(b.gross || 0), net = gross * (1 - FEE / 100);
     const cost = b.cost === '' ? null : Number(b.cost);
     const profit = cost == null ? null : net - cost, roi = cost > 0 ? profit / cost * 100 : null;
@@ -251,6 +265,13 @@ function renderBreaks() {
       <td style="text-align:right;font-weight:600;color:${profit==null?'var(--muted)':profit>=0?'var(--green)':'var(--red)'}">${profit==null?'—':fmt(profit)}</td>
       <td style="text-align:right">${roi==null?'<span class="mini">add cost</span>':`<span class="pill ${roi>=0?'green':'red'}">${roi>=0?'+':''}${roi.toFixed(0)}%</span>`}</td></tr>`;
   }).join('') || '<tr><td colspan="7" class="mini" style="padding:14px">No breaks yet.</td></tr>';
+  const from = total ? startIdx + 1 : 0, to = Math.min(startIdx + breakPageSize, total);
+  $('#breaksPager').innerHTML = total <= breakPageSize
+    ? `<span class="mini">${total} break${total===1?'':'s'}</span><span></span>`
+    : `<span class="mini">${from}–${to} of ${total}</span><span><button class="chip" id="bPrev" ${breakPage===0?'disabled':''}>‹ Prev</button><span class="mini" style="margin:0 8px">Page ${breakPage+1}/${pages}</span><button class="chip" id="bNext" ${breakPage>=pages-1?'disabled':''}>Next ›</button></span>`;
+  const pv = $('#bPrev'), nx = $('#bNext');
+  if (pv) pv.onclick = () => { breakPage--; renderBreaks(); };
+  if (nx) nx.onclick = () => { breakPage++; renderBreaks(); };
   document.querySelectorAll('#breaks input').forEach(inp => inp.onchange = async e => {
     const b = breaks[+e.target.dataset.i]; b.cost = e.target.value === '' ? '' : Number(e.target.value);
     if (b.cost !== '') await sb.from('break_costs').upsert({ bridge_key: KEY, break_id: b.break_id, cost: b.cost, total_slots: b.total_slots || null });
@@ -282,11 +303,35 @@ async function loadFeatures() {
 async function loadBilling() {
   const { data } = await sb.from('client_billing').select('*').eq('key', KEY).maybeSingle();
   const b = data || {};
-  $('#bill').innerHTML = `<div style="display:flex;gap:30px;flex-wrap:wrap">
-    <div><div class="mini">Plan</div><b style="font-size:18px">${b.tier || '—'}</b></div>
-    <div><div class="mini">Status</div><span class="pill ${b.subscription_status==='active'||b.subscription_status==='grandfathered'?'green':'muted'}">${b.subscription_status || 'none'}</span></div>
-    <div><div class="mini">Monthly</div><b style="font-size:18px">${b.monthly_amount ? '$'+b.monthly_amount : '$0'}</b></div>
-    <div><div class="mini">Founding member</div><b style="font-size:18px">${b.founding_member ? 'Yes' : 'No'}</b></div></div>`;
+  const grand = b.grandfathered, status = b.subscription_status || 'none';
+  $('#bill').innerHTML = `<div style="display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start">
+      <div><div class="mini">Plan</div><b style="font-size:18px;text-transform:capitalize">${b.tier || '—'}</b></div>
+      <div><div class="mini">Status</div><span class="pill ${status==='active'||status==='grandfathered'?'green':status==='past_due'?'red':'muted'}">${status}</span></div>
+      <div><div class="mini">Monthly</div><b style="font-size:18px">${b.monthly_amount ? '$'+b.monthly_amount : '$0'}</b></div>
+      <div><div class="mini">Hosting</div><b style="font-size:18px">${grand ? 'Free (grandfathered)' : (b.tier && b.tier !== 'local' ? 'Included' : '—')}</b></div>
+      ${b.current_period_end ? `<div><div class="mini">Renews</div><b style="font-size:18px">${(b.current_period_end||'').slice(0,10)}</b></div>` : ''}
+    </div>
+    ${grand ? `<div class="fb acc" style="margin-top:14px;max-width:540px"><div class="l">Founding Member offer</div><div style="margin:5px 0 10px">Keep your free hosting and add the analytics dashboard + portal for <b>~$12/mo</b>.</div><button class="btn gold" id="founding">Add analytics — $12/mo</button></div>` : ''}`;
+  const fbtn = $('#founding'); if (fbtn) fbtn.onclick = () => requestPlan('Founding Member ($12/mo)');
+  const plans = [
+    { id: 'local', name: 'Local', price: '$179', sub: 'one-time', feats: ['1 layout', 'Manual mark-sold', 'Email support'] },
+    { id: 'pro', name: 'Pro', price: '$349 + $29/mo', sub: 'most popular', feats: ['Live automation', 'Up to 3 layouts', 'Scores ticker', 'Portal + analytics'] },
+    { id: 'elite', name: 'Elite', price: '$599 + $49/mo', sub: 'high volume', feats: ['Everything in Pro', 'Up to 5 layouts', 'Priority queue & support', '2nd channel option'] },
+  ];
+  const cur = (b.tier || '').toLowerCase();
+  $('#plans').innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">' + plans.map(p => `
+    <div class="card" style="margin:0;${cur===p.id ? 'border-color:var(--gold)' : ''}">
+      <div style="font-weight:700">${p.name} ${cur===p.id ? '<span class="pill green" style="margin-left:6px">Current</span>' : ''}</div>
+      <div style="font-size:20px;font-weight:800;margin:6px 0">${p.price}<span class="mini" style="font-weight:500"> · ${p.sub}</span></div>
+      <div class="mini" style="line-height:1.9">${p.feats.map(x => '✓ ' + x).join('<br>')}</div>
+      ${cur===p.id ? '' : `<button class="btn ghost" style="width:100%;margin-top:10px" data-plan="${p.name}">Request ${p.name}</button>`}
+    </div>`).join('') + '</div>';
+  document.querySelectorAll('#plans [data-plan]').forEach(btn => btn.onclick = () => requestPlan(btn.dataset.plan));
+  $('#invoices').innerHTML = '<div class="mini">No invoices yet. Billing is handled directly with TSU for now — your invoice history will appear here once online payments are connected.</div>';
+}
+async function requestPlan(plan) {
+  const { error } = await sb.from('support_tickets').insert({ bridge_key: KEY, source: 'portal', subject: 'Plan change request: ' + plan, summary: 'Requested from the billing page.' });
+  alert(error ? 'Could not send request — please try again.' : "Request sent — we'll confirm your " + plan + " change by email.");
 }
 
 // Bot — calls the assist Edge Function with the user's JWT (auto-attached by supabase-js)
