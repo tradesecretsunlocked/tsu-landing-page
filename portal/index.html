@@ -341,7 +341,7 @@ async function loadFeatures() {
   document.querySelectorAll('#features .sw[data-svc]').forEach(sw => sw.onclick = async () => {
     const svc = sw.dataset.svc, next = !sw.classList.contains('on');
     sw.classList.toggle('on', next); // optimistic
-    const { data, error } = await sb.functions.invoke('toggle-feature', { body: { service: svc, enabled: next } });
+    const { data, error } = await sb.functions.invoke('toggle-feature', { body: { service: svc, enabled: next, bridge_key: KEY } });
     if (error || (data && data.error)) sw.classList.toggle('on', !next); // revert on failure
   });
 }
