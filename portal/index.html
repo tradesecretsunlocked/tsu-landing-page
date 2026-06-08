@@ -191,12 +191,12 @@ async function start() {
   if (!cu || !cu.length) { $('#analytics').innerHTML = '<div class="err">Your login isn\'t linked to a client yet. Contact TSU support.</div>'; return; }
   KEY = cu[0].bridge_key;
   await loadClientPanels();
-  botInit();
 }
 async function loadClientPanels() {
   $('#adminOverview').classList.add('hidden');
   if (!document.querySelector('.page.active')) document.getElementById('analytics').classList.add('active');
   await Promise.all([loadHeader(), loadSettings(), loadAnalytics(), loadBreaks(), loadFeatures(), loadBilling()]);
+  botInit();   // starts the bot for the active client (seller, or admin View-as)
 }
 async function initAdmin() {
   $('#adminBar').classList.remove('hidden');
@@ -399,11 +399,11 @@ function bmsg(html, who) { const m = document.createElement('div'); m.className 
 function setChips(arr) { chips.innerHTML = ''; (arr || []).forEach(c => { const x = document.createElement('button'); x.className = 'chip'; x.textContent = c.t; x.onclick = () => send(c); chips.appendChild(x); }); }
 function md(s) { return (s || '').replace(/\*\*(.+?)\*\*/g, '<b>$1</b>'); }
 async function call(payload) {
-  const { data, error } = await sb.functions.invoke('assist', { body: payload });
+  const { data, error } = await sb.functions.invoke('assist', { body: { ...payload, bridge_key: KEY } });
   if (error || !data) { bmsg('Sorry, I had trouble reaching support services. Please try again.'); return null; }
   return data;
 }
-async function botInit() { const d = await call({ action: 'open' }); if (d) { bmsg(md(d.reply)); setChips(d.chips); } }
+async function botInit() { if (!KEY) return; bb.innerHTML = ''; chips.innerHTML = ''; const d = await call({ action: 'open' }); if (d) { bmsg(md(d.reply)); setChips(d.chips); } }
 async function send(c) {
   bmsg(c.t, 'user');
   if (c.a === 'resolved') { bmsg('Great — glad that helped! Anything else?'); setChips([{ t: 'Run health check', a: 'health' }, { t: 'No, thanks', a: 'done' }]); return; }
