@@ -134,7 +134,7 @@
       </div>
 
       <div class="page" id="overlay">
-        <div class="card"><h3>Features</h3><div class="mini" style="margin-bottom:6px">Toggle your self-service features. Plan-managed features show as “Managed” — change those via Billing or Support.</div><div id="features"></div></div>
+        <div class="card"><h3>Features</h3><div class="mini" style="margin-bottom:6px">Features you can switch yourself show a toggle. Features included in your plan show <b>Included</b>. Anything not on your plan shows <b>Upgrade</b> — tap it to see plan options.</div><div id="features"></div></div>
         <div class="card"><h3>Overlay connection</h3><div id="conn"></div></div>
       </div>
 
@@ -329,12 +329,14 @@ async function loadFeatures() {
     sb.from('client_services').select('service, enabled').eq('key', KEY)
   ]);
   const on = {}; (cs || []).forEach(r => on[r.service] = r.enabled);
-  const ic = { scores: '🏈', automation: '⚡', hosting: '☁️', analytics: '📊', portal: '🔑' };
+  const ic = { scores: '🏈', automation: '⚡', hosting: '☁️', analytics: '📊', portal: '🔑', chatbot: '💬' };
   $('#features').innerHTML = (cat || []).map(c => {
     const isOn = !!on[c.service];
     const right = SELF_SERVICE.has(c.service)
       ? `<div class="sw ${isOn ? 'on' : ''}" data-svc="${c.service}"></div>`
-      : `<span class="pill ${isOn ? 'green' : 'muted'}">${isOn ? 'On · plan' : 'Managed'}</span>`;
+      : (isOn
+          ? `<span class="pill green">Included</span>`
+          : `<button class="btn ghost upg" data-upg="${c.service}" style="padding:6px 12px">Upgrade</button>`);
     return `<div class="feat"><div class="ic">${ic[c.service] || '•'}</div>
       <div style="flex:1"><b>${c.label}</b><div class="mini">${c.description || ''}</div></div>${right}</div>`;
   }).join('');
@@ -344,11 +346,17 @@ async function loadFeatures() {
     const { data, error } = await sb.functions.invoke('toggle-feature', { body: { service: svc, enabled: next, bridge_key: KEY } });
     if (error || (data && data.error)) sw.classList.toggle('on', !next); // revert on failure
   });
+  document.querySelectorAll('#features .upg[data-upg]').forEach(b => b.onclick = () => {
+    const nav = document.querySelector('.nav[data-p="billing"]'); if (nav) nav.click();
+  });
 }
 const PAY_LINKS = {
-  pro:      'https://buy.stripe.com/7sYeVfgeX288cR23jFdnW00',
-  elite:    'https://buy.stripe.com/7sYeVf3sbaEE2co8DZdnW01',
-  founding: 'https://buy.stripe.com/14A9AV7IrcMM3gsbQbdnW02',
+  pro:             'https://buy.stripe.com/7sYeVfgeX288cR23jFdnW00',
+  elite:           'https://buy.stripe.com/7sYeVf3sbaEE2co8DZdnW01',
+  founding:        'https://buy.stripe.com/14A9AV7IrcMM3gsbQbdnW02',
+  pro_annual:      'https://buy.stripe.com/bJe3cx3sb9AA2cocUfdnW03',
+  elite_annual:    'https://buy.stripe.com/fZu3cxfaTcMM3gs9I3dnW04',
+  founding_annual: 'https://buy.stripe.com/14AdRbbYHaEEg3ebQbdnW05',
 };
 async function goCheckout(planId) {
   const link = PAY_LINKS[planId]; if (!link || !KEY) return;
@@ -367,12 +375,13 @@ async function loadBilling() {
       <div><div class="mini">Hosting</div><b style="font-size:18px">${grand ? 'Free (grandfathered)' : (b.tier && b.tier !== 'local' ? 'Included' : '—')}</b></div>
       ${b.current_period_end ? `<div><div class="mini">Renews</div><b style="font-size:18px">${(b.current_period_end||'').slice(0,10)}</b></div>` : ''}
     </div>
-    ${grand ? `<div class="fb acc" style="margin-top:14px;max-width:540px"><div class="l">Founding Member offer</div><div style="margin:5px 0 10px">Keep your free hosting and add the analytics dashboard + portal for <b>~$12/mo</b>.</div><button class="btn gold" id="founding">Add analytics — $12/mo</button></div>` : ''}`;
+    ${grand ? `<div class="fb acc" style="margin-top:14px;max-width:540px"><div class="l">Founding Member offer</div><div style="margin:5px 0 10px">Keep your free hosting and add the analytics dashboard + portal for <b>~$12/mo</b> — or <b>$120/yr</b> (save $24).</div><button class="btn gold" id="founding">Add analytics — $12/mo</button> <button class="btn ghost" id="foundingA" style="margin-left:6px">Pay yearly · $120/yr</button></div>` : ''}`;
   const fbtn = $('#founding'); if (fbtn) fbtn.onclick = () => goCheckout('founding');
+  const fbtnA = $('#foundingA'); if (fbtnA) fbtnA.onclick = () => goCheckout('founding_annual');
   const plans = [
     { id: 'local', name: 'Local', price: '$179', sub: 'one-time', feats: ['1 layout', 'Manual mark-sold', 'Email support'] },
-    { id: 'pro', name: 'Pro', price: '$349 build + $29/mo', sub: 'most popular', pay: 'pro', mo: '$29', feats: ['Live automation', 'Up to 3 layouts', 'Scores ticker', 'Portal + analytics'] },
-    { id: 'elite', name: 'Elite', price: '$599 build + $49/mo', sub: 'high volume', pay: 'elite', mo: '$49', feats: ['Everything in Pro', 'Up to 5 layouts', 'Priority queue & support', '2nd channel option'] },
+    { id: 'pro', name: 'Pro', price: '$349 build + $29/mo', sub: 'most popular', pay: 'pro', mo: '$29', payA: 'pro_annual', yr: '$290/yr', save: 'save $58', feats: ['Live automation', 'Up to 3 layouts', 'Scores ticker', 'Portal + analytics'] },
+    { id: 'elite', name: 'Elite', price: '$599 build + $49/mo', sub: 'high volume', pay: 'elite', mo: '$49', payA: 'elite_annual', yr: '$490/yr', save: 'save $98', feats: ['Everything in Pro', 'Up to 5 layouts', 'Priority queue & support', '2nd channel option'] },
   ];
   const cur = (b.tier || '').toLowerCase();
   $('#plans').innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">' + plans.map(p => `
@@ -381,12 +390,19 @@ async function loadBilling() {
       <div style="font-size:20px;font-weight:800;margin:6px 0">${p.price}<span class="mini" style="font-weight:500"> · ${p.sub}</span></div>
       <div class="mini" style="line-height:1.9">${p.feats.map(x => '✓ ' + x).join('<br>')}</div>
       ${cur===p.id ? '' : (p.pay
-          ? `<button class="btn gold" style="width:100%;margin-top:10px" data-pay="${p.pay}">Subscribe (${p.mo}/mo)</button>`
+          ? `<button class="btn gold" style="width:100%;margin-top:10px" data-pay="${p.pay}">Subscribe (${p.mo}/mo)</button>${p.payA ? `<button class="btn ghost" style="width:100%;margin-top:6px" data-pay="${p.payA}">Pay yearly · ${p.yr} <span class="mini">(${p.save})</span></button>` : ''}`
           : `<button class="btn ghost" style="width:100%;margin-top:10px" data-plan="${p.name}">Request ${p.name}</button>`)}
     </div>`).join('') + '</div>';
   document.querySelectorAll('#plans [data-pay]').forEach(btn => btn.onclick = () => goCheckout(btn.dataset.pay));
   document.querySelectorAll('#plans [data-plan]').forEach(btn => btn.onclick = () => requestPlan(btn.dataset.plan));
-  $('#invoices').innerHTML = '<div class="mini">No invoices yet. Billing is handled directly with TSU for now — your invoice history will appear here. Manage card/cancel via the Stripe receipt emails for now.</div>';
+  $('#invoices').innerHTML = '<button class="btn ghost" id="manageBilling">Manage billing — card, invoices, cancel</button><div class="mini" style="margin-top:8px">Opens your secure Stripe billing portal (available once you have an active subscription).</div>';
+  const mb = $('#manageBilling'); if (mb) mb.onclick = async () => {
+    const label = mb.textContent; mb.disabled = true; mb.textContent = 'Opening…';
+    const { data, error } = await sb.functions.invoke('billing-portal', { body: { bridge_key: KEY, return_url: window.location.href } });
+    mb.disabled = false; mb.textContent = label;
+    if (error || !data || data.error || !data.url) { alert((data && data.error) || "Billing portal isn't available yet."); return; }
+    window.open(data.url, '_blank');
+  };
 }
 async function requestPlan(plan) {
   const { error } = await sb.from('support_tickets').insert({ bridge_key: KEY, source: 'portal', subject: 'Plan change request: ' + plan, summary: 'Requested from the billing page.' });
