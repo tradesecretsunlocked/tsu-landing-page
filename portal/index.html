@@ -80,9 +80,13 @@
   <div class="login-card">
     <img src="assets/tsu-lab-logo.png" alt="TSU LAB" style="width:230px;max-width:100%;margin:0 auto 14px;display:block;mix-blend-mode:screen">
     <h1>Client Portal</h1>
-    <p>Enter your email and we'll send you a secure sign-in link.</p>
+    <p>Enter your email — we'll send a 6-digit code (and a sign-in link).</p>
     <input id="email" type="email" placeholder="you@email.com" autocomplete="email">
-    <button id="sendLink">Send sign-in link</button>
+    <button id="sendLink">Send code</button>
+    <div id="otpRow" style="display:none;margin-top:10px">
+      <input id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code">
+      <button id="verifyCode" style="margin-top:8px">Sign in</button>
+    </div>
     <div class="login-msg" id="loginMsg"></div>
   </div>
 </div>
@@ -173,8 +177,18 @@ $('#sendLink').onclick = async () => {
   const email = $('#email').value.trim();
   if (!email) return;
   $('#loginMsg').textContent = 'Sending…';
-  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href } });
-  $('#loginMsg').textContent = error ? error.message : 'Check your email for the sign-in link ✉️';
+  const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href, shouldCreateUser: true } });
+  if (error) { $('#loginMsg').textContent = error.message; return; }
+  $('#otpRow').style.display = 'block';
+  $('#loginMsg').textContent = 'Check your email: enter the 6-digit code below (works on any device), or click the link.';
+};
+$('#verifyCode').onclick = async () => {
+  const email = $('#email').value.trim();
+  const token = ($('#otpCode').value || '').trim();
+  if (!email || !token) return;
+  $('#loginMsg').textContent = 'Verifying…';
+  const { error } = await sb.auth.verifyOtp({ email, token, type: 'email' });
+  $('#loginMsg').textContent = error ? error.message : 'Signed in ✓';
 };
 $('#signout').onclick = async () => { await sb.auth.signOut(); location.reload(); };
 sb.auth.onAuthStateChange((_e, session) => { if (session) start(); });
