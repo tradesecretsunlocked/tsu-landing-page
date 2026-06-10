@@ -80,12 +80,13 @@
   <div class="login-card">
     <img src="assets/tsu-lab-logo.png" alt="TSU LAB" style="width:230px;max-width:100%;margin:0 auto 14px;display:block;mix-blend-mode:screen">
     <h1>Client Portal</h1>
-    <p>Enter your email — we'll send a 6-digit code (and a sign-in link).</p>
+    <p>Sign in with your password, or leave it blank to get a one-time code by email.</p>
     <input id="email" type="email" placeholder="you@email.com" autocomplete="email">
-    <button id="sendLink">Send code</button>
+    <input id="pw" type="password" placeholder="Password (blank = email me a code)" autocomplete="current-password" style="margin-top:8px">
+    <button id="sendLink" style="margin-top:8px">Sign in</button>
     <div id="otpRow" style="display:none;margin-top:10px">
       <input id="otpCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" placeholder="6-digit code">
-      <button id="verifyCode" style="margin-top:8px">Sign in</button>
+      <button id="verifyCode" style="margin-top:8px">Verify code</button>
     </div>
     <div class="login-msg" id="loginMsg"></div>
   </div>
@@ -97,8 +98,10 @@
     <a class="nav active" data-p="analytics">📊 Breaks &amp; Analytics</a>
     <a class="nav" data-p="overlay">🎛️ Overlay &amp; Features</a>
     <a class="nav" data-p="billing">💳 Billing</a>
+    <a class="nav" data-p="orders">📦 Orders</a>
     <a class="nav" data-p="help">💬 Help &amp; Support</a>
     <div class="spacer"></div>
+    <button class="signout" id="setPwBtn">Set password</button>
     <button class="signout" id="signout">Sign out</button>
   </aside>
   <div class="main">
@@ -148,6 +151,10 @@
         <div class="card"><h3>Invoices</h3><div id="invoices"></div></div>
       </div>
 
+      <div class="page" id="orders">
+        <div class="card"><h3>Your orders</h3><div class="mini" style="margin-bottom:6px">Overlay builds &amp; add-ons. Status updates as we work — anything needing you shows a prompt.</div><div id="ordersList">Loading…</div></div>
+      </div>
+
       <div class="page" id="help">
         <div class="bot">
           <div class="bh"><div class="av">T</div><div><b>TSU Assist</b><div class="mini">Health checks · troubleshooting · tickets</div></div></div>
@@ -175,7 +182,14 @@ let KEY = null, FEE = 11, daily = [], breaks = [], TF = 30;
 // Auth
 $('#sendLink').onclick = async () => {
   const email = $('#email').value.trim();
+  const pw = ($('#pw') && $('#pw').value) || '';
   if (!email) return;
+  if (pw) {
+    $('#loginMsg').textContent = 'Signing in…';
+    const { error } = await sb.auth.signInWithPassword({ email, password: pw });
+    $('#loginMsg').textContent = error ? error.message : 'Signed in ✓';
+    return;
+  }
   $('#loginMsg').textContent = 'Sending…';
   const { error } = await sb.auth.signInWithOtp({ email, options: { emailRedirectTo: window.location.href, shouldCreateUser: true } });
   if (error) { $('#loginMsg').textContent = error.message; return; }
@@ -191,6 +205,12 @@ $('#verifyCode').onclick = async () => {
   $('#loginMsg').textContent = error ? error.message : 'Signed in ✓';
 };
 $('#signout').onclick = async () => { await sb.auth.signOut(); location.reload(); };
+$('#setPwBtn').onclick = async () => {
+  const pw = window.prompt('Set a password for faster login next time (min 6 characters):');
+  if (!pw) return;
+  const { error } = await sb.auth.updateUser({ password: pw });
+  alert(error ? ('Could not set password: ' + error.message) : 'Password set \u2713 — use it to sign in next time.');
+};
 sb.auth.onAuthStateChange((_e, session) => { if (session) start(); });
 (async () => { const { data } = await sb.auth.getSession(); if (data.session) start(); })();
 
@@ -209,7 +229,7 @@ async function start() {
 async function loadClientPanels() {
   $('#adminOverview').classList.add('hidden');
   if (!document.querySelector('.page.active')) document.getElementById('analytics').classList.add('active');
-  await Promise.all([loadHeader(), loadSettings(), loadAnalytics(), loadBreaks(), loadFeatures(), loadBilling()]);
+  await Promise.all([loadHeader(), loadSettings(), loadAnalytics(), loadBreaks(), loadFeatures(), loadBilling(), loadOrders()]);
   botInit();   // starts the bot for the active client (seller, or admin View-as)
 }
 async function initAdmin() {
@@ -340,17 +360,17 @@ function renderBreaks() {
 async function loadFeatures() {
   const [{ data: cat }, { data: cs }] = await Promise.all([
     sb.from('service_catalog').select('*').order('sort_order'),
-    sb.from('client_services').select('service, enabled').eq('key', KEY)
+    sb.from('client_services').select('service, enabled, entitled').eq('key', KEY)
   ]);
-  const on = {}; (cs || []).forEach(r => on[r.service] = r.enabled);
+  const on = {}, ent = {}; (cs || []).forEach(r => { on[r.service] = r.enabled; ent[r.service] = r.entitled; });
   const ic = { scores: '🏈', automation: '⚡', hosting: '☁️', analytics: '📊', portal: '🔑', chatbot: '💬' };
   $('#features').innerHTML = (cat || []).map(c => {
-    const isOn = !!on[c.service];
-    const right = SELF_SERVICE.has(c.service)
-      ? `<div class="sw ${isOn ? 'on' : ''}" data-svc="${c.service}"></div>`
-      : (isOn
-          ? `<span class="pill green">Included</span>`
-          : `<button class="btn ghost upg" data-upg="${c.service}" style="padding:6px 12px">Upgrade</button>`);
+    const isOn = !!on[c.service], isEnt = !!ent[c.service];
+    const right = !isEnt
+      ? `<button class="btn ghost upg" data-upg="${c.service}" style="padding:6px 12px">Upgrade</button>`
+      : (c.self_serviceable
+          ? `<div class="sw ${isOn ? 'on' : ''}" data-svc="${c.service}"></div>`
+          : `<span class="pill green">Included</span>`);
     return `<div class="feat"><div class="ic">${ic[c.service] || '•'}</div>
       <div style="flex:1"><b>${c.label}</b><div class="mini">${c.description || ''}</div></div>${right}</div>`;
   }).join('');
@@ -378,14 +398,31 @@ async function goCheckout(planId) {
   const url = link + '?client_reference_id=' + encodeURIComponent(KEY) + (user && user.email ? '&prefilled_email=' + encodeURIComponent(user.email) : '');
   window.open(url, '_blank');
 }
+const ORDER_STEPS = ['received','questionnaire','in_queue','in_build','review','delivered','live'];
+const ORDER_LABEL = {received:'Received',questionnaire:'Questionnaire',in_queue:'In queue',in_build:'In build',review:'Review',delivered:'Delivered',live:'Live'};
+async function loadOrders() {
+  const { data } = await sb.from('orders').select('*').order('submitted_at', { ascending: false });
+  const rows = data || [];
+  if (!rows.length) { $('#ordersList').innerHTML = '<div class="mini">No orders yet — your overlay & add-on orders will show here.</div>'; return; }
+  $('#ordersList').innerHTML = rows.map(o => {
+    const ci = Math.max(0, ORDER_STEPS.indexOf(o.status));
+    const steps = ORDER_STEPS.map((st,i) => `<span class="pill ${i<=ci?'green':'muted'}" style="margin:2px">${i<ci?'✓ ':(i===ci?'● ':'')}${ORDER_LABEL[st]}</span>`).join('');
+    const due = o.due_date ? `<span class="mini">Est. ${o.due_date}</span>` : '';
+    const action = o.action_needed ? `<div class="fb acc" style="margin-top:8px"><div class="l">Action needed</div>${o.action_needed}</div>` : '';
+    const delivered = (o.status==='delivered'||o.status==='live') ? '<span class="mini">✅ Delivered</span>' : '';
+    return `<div class="card" style="margin:0 0 10px"><div style="display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px"><b>${o.product||'Order'}</b>${due}</div><div style="margin:8px 0;line-height:2">${steps}</div>${delivered}${action}</div>`;
+  }).join('');
+}
 async function loadBilling() {
   const { data } = await sb.from('client_billing').select('*').eq('key', KEY).maybeSingle();
   const b = data || {};
   const grand = b.grandfathered, status = b.subscription_status || 'none';
+  const annual = !!(b.current_period_end && (new Date(b.current_period_end) - Date.now()) > 60*864e5);
   $('#bill').innerHTML = `<div style="display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start">
       <div><div class="mini">Plan</div><b style="font-size:18px;text-transform:capitalize">${b.tier || '—'}</b></div>
       <div><div class="mini">Status</div><span class="pill ${status==='active'||status==='grandfathered'?'green':status==='past_due'?'red':'muted'}">${status}</span></div>
-      <div><div class="mini">Monthly</div><b style="font-size:18px">${b.monthly_amount ? '$'+b.monthly_amount : '$0'}</b></div>
+      <div><div class="mini">Price</div><b style="font-size:18px">${b.monthly_amount ? '$'+b.monthly_amount+'/mo' : '$0'}</b></div>
+      <div><div class="mini">Billing</div><b style="font-size:18px">${annual ? 'Annual' : (status==='active' ? 'Monthly' : '—')}</b></div>
       <div><div class="mini">Hosting</div><b style="font-size:18px">${grand ? 'Free (grandfathered)' : (b.tier && b.tier !== 'local' ? 'Included' : '—')}</b></div>
       ${b.current_period_end ? `<div><div class="mini">Renews</div><b style="font-size:18px">${(b.current_period_end||'').slice(0,10)}</b></div>` : ''}
     </div>
