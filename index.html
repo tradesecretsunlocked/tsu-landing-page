@@ -23,7 +23,7 @@
       --bg3:         #161b30;
       --card:        #121628;
       --border:      rgba(255,255,255,0.07);
-      --border-gold: rgba(212,175,55,0.28);
+      --border-gold: rgba(212,175,55,0.80);
       --border-navy: rgba(26,47,138,0.4);
       --text:        #f0f0f0;
       --muted:       #8896b8;
@@ -67,7 +67,7 @@
     .btn {
       display: inline-flex; align-items: center; gap: 8px;
       padding: 14px 28px; border-radius: 8px;
-      font-size: 15px; font-weight: 700; letter-spacing: 0.02em;
+      font-size: 18px; font-weight: 700; letter-spacing: 0.02em;
       transition: all var(--transition); white-space: nowrap;
     }
     .btn-gold {
@@ -130,8 +130,10 @@
       display: flex; align-items: center; gap: 10px;
     }
     .nav-logo-img {
-      height: 65px; width: auto; max-width: 280px;
+      height: 75px; width: auto; max-width: 280px;
       object-fit: contain; display: block;
+      position:relative;
+      top:10px;
     }
     .nav-logo-img-fallback {
       height: 36px; width: 36px; border-radius: 6px;
@@ -149,7 +151,7 @@
       display: flex; align-items: center; gap: 32px; list-style: none;
     }
     .nav-links a {
-      font-size: 15.5px; font-weight: 700; color: var(--gold);
+      font-size: 18.5px; font-weight: 700; color: var(--gold);
       letter-spacing: 0.01em; transition: color var(--transition);
     }
     .nav-links a:hover { color: var(--gold2); }
@@ -168,7 +170,7 @@
     .hero-grid {
       position: relative; z-index: 1;
       display: grid; grid-template-columns: 1.04fr 0.96fr;
-      gap: 52px; align-items: center; margin-bottom: 60px;
+      gap: 30px; align-items: center; margin-bottom: 20px;
     }
     @media (max-width: 920px) { .hero-grid { grid-template-columns: 1fr; gap: 44px; } }
     .hero-content { position: relative; z-index: 1; }
@@ -203,7 +205,7 @@
     /* Hero visual, two overlapping overlay screenshots */
     .hero-shots {
       position: relative; z-index: 1;
-      width: 100%; max-width: 460px; margin: 0 auto;
+      width: 92%; max-width: 460px; margin: 0 auto;
       aspect-ratio: 1 / 1.16;
     }
     @media (max-width: 920px) { .hero-shots { max-width: 420px; } }
@@ -256,7 +258,7 @@
     .proof-heading {
       text-align: center;
       font-size: 14px; font-weight: 700; letter-spacing: 0.14em;
-      text-transform: uppercase; color: var(--muted); margin-bottom: 28px;
+      text-transform: uppercase; color: var(--muted); margin-bottom: 8px;
     }
     .proof-heading span { color: var(--gold); }
     .logo-marquee {
@@ -798,13 +800,13 @@
   <div class="container">
     <div class="hero-grid">
       <div class="hero-content">
-        <div class="hero-badge">Now powering 60+ card break streamers</div>
+        <div class="hero-badge">Now powering hundreds of card break streamers</div>
         <h1 class="hero-h1">
           Your Break Looks Amateur.<br>
           <em>Your Buyers Notice.</em>
         </h1>
         <p class="hero-sub">
-          Still running your break off a paper sheet, scribbling in team names, scratching them out, scrambling to write down who bought what while you're live on camera? It's a mess, it's hard to follow, you're more likely to make mistakes, and it makes you look unorganized and inexperienced. <strong style="color:var(--text)">Now picture this:</strong> a buyer hits purchase and their team locks in on a clean, professional-grade board, automatically. No paper. No scribbles. No mistakes. <strong style="color:var(--text)">That's a TSU overlay</strong>, and it's why your stream starts looking like the pros.
+          Still running your break off a sheet of paper & marker? Scribbling in team names, scratching them out, scrambling to write down who bought what while you're live? It's a mess, it's hard to follow, you're more likely to make mistakes, and it makes you look unorganized and inexperienced. <strong style="color:var(--text)">Now picture this:</strong> a buyer hits purchase and their team locks in on a clean, professional-grade board, automatically. No paper. No scribbles. No mistakes. <strong style="color:var(--text)">That's a TSU overlay</strong>, and it's why your stream starts looking like the pros.
         </p>
         <div class="hero-cta">
           <a href="#portfolio" class="btn btn-gold">See Real Builds &rarr;</a>
@@ -818,26 +820,26 @@
     </div>
     <div class="hero-metrics">
       <div class="metric fade-up">
-        <div class="metric-icon">🎯</div>
+    
         <div class="metric-big">+17%</div>
         <div class="metric-name">More engagement</div>
         <div class="metric-label">A polished, professional-grade board builds instant buyer trust. Bidders jump in faster and push higher.</div>
       </div>
       <div class="metric fade-up" style="transition-delay:0.08s">
-        <div class="metric-icon">📈</div>
+    
         <div class="metric-big">+38%</div>
         <div class="metric-name">Longer Watch Time</div>
         <div class="metric-label">A clean, animated overlay turns your break into a show, viewers stick around to the end.</div>
       </div>
       <div class="metric fade-up" style="transition-delay:0.16s">
-        <div class="metric-icon">🔁</div>
+
         <div class="metric-big">+13%</div>
         <div class="metric-name">Repeat Buyers</div>
         <div class="metric-label">Look pro once and you're the channel they remember. They come back break after break.</div>
       </div>
       <div class="metric fade-up" style="transition-delay:0.24s">
-        <div class="metric-icon">⚡</div>
-        <div class="metric-big">1.5+ hrs</div>
+   
+        <div class="metric-big">1.5+ hrs avg.</div>
         <div class="metric-name">Saved Every Stream</div>
         <div class="metric-label">Hours you'd lose to paper and manual tracking go straight back into sourcing, promoting, and running more breaks.</div>
       </div>
