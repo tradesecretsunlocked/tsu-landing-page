@@ -126,7 +126,7 @@
         <div class="card">
           <div class="row-between" style="margin:0">
             <h3 style="margin:0">Profit &amp; ROI</h3>
-            <div class="mini">Whatnot fee <input class="ci" id="fee" type="number" step="0.5" style="width:60px"> % <button class="chip" id="saveFee">Save</button></div>
+            <div class="mini" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">Processing <input class="ci" id="procPct" type="number" step="0.1" style="width:54px">% + $<input class="ci" id="procFlat" type="number" step="0.01" style="width:56px">/txn &middot; Commission <input class="ci" id="commPct" type="number" step="0.5" style="width:54px">% <button class="chip" id="saveFee">Save</button></div>
           </div>
           <div class="fin" id="fin"></div>
         </div>
@@ -142,6 +142,7 @@
 
       <div class="page" id="overlay">
         <div class="card"><h3>Features</h3><div class="mini" style="margin-bottom:6px">Features you can switch yourself show a toggle. Features included in your plan show <b>Included</b>. Anything not on your plan shows <b>Upgrade</b> — tap it to see plan options.</div><div id="features"></div></div>
+        <div class="card"><h3>🧪 In the works &amp; beta</h3><div class="mini" style="margin-bottom:6px">Upcoming and in-testing features. Want early access? Tap below and we&rsquo;ll reach out.</div><div id="betaFeatures"></div></div>
         <div class="card"><h3>Overlay connection</h3><div id="conn"></div></div>
       </div>
 
@@ -177,7 +178,7 @@ const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
 const $ = s => document.querySelector(s);
 const fmt = n => '$' + Math.round(n || 0).toLocaleString();
 const SELF_SERVICE = new Set(['scores']); // sellers can flip these; others are plan-managed
-let KEY = null, FEE = 11, daily = [], breaks = [], TF = 30;
+let KEY = null, PROC_PCT = 2.9, PROC_FLAT = 0.30, COMM_PCT = 8, daily = [], breaks = [], TF = 30;
 
 // Auth
 $('#sendLink').onclick = async () => {
@@ -280,12 +281,19 @@ async function loadHeader() {
   $('#conn').innerHTML = `<div style="display:flex;align-items:center;gap:10px"><span class="dot ${s}"></span><b>${({live:'Connected',idle:'Idle',stale:'Inactive',revoked:'Inactive',never_connected:'Not connected'})[s]||s}</b><span class="mini">${h.seconds_since_last_event!=null?'· last event '+h.seconds_since_last_event+'s ago':''}</span></div><div class="mini" style="margin-top:8px">Your OBS overlay URL is in your welcome email. Need it resent? Ask TSU Assist.</div>`;
 }
 async function loadSettings() {
-  const { data } = await sb.from('client_settings').select('whatnot_fee_pct').eq('key', KEY).maybeSingle();
-  FEE = data ? Number(data.whatnot_fee_pct) : 11; $('#fee').value = FEE;
+  const { data } = await sb.from('client_settings').select('processing_pct, processing_flat, commission_pct').eq('key', KEY).maybeSingle();
+  PROC_PCT  = data && data.processing_pct  != null ? Number(data.processing_pct)  : 2.9;
+  PROC_FLAT = data && data.processing_flat != null ? Number(data.processing_flat) : 0.30;
+  COMM_PCT  = data && data.commission_pct  != null ? Number(data.commission_pct)  : 8;
+  if ($('#procPct'))  $('#procPct').value  = PROC_PCT;
+  if ($('#procFlat')) $('#procFlat').value = PROC_FLAT;
+  if ($('#commPct'))  $('#commPct').value  = COMM_PCT;
 }
 $('#saveFee').onclick = async () => {
-  FEE = Number($('#fee').value) || 0;
-  await sb.from('client_settings').update({ whatnot_fee_pct: FEE }).eq('key', KEY);
+  PROC_PCT  = Number($('#procPct').value)  || 0;
+  PROC_FLAT = Number($('#procFlat').value) || 0;
+  COMM_PCT  = Number($('#commPct').value)  || 0;
+  await sb.from('client_settings').update({ processing_pct: PROC_PCT, processing_flat: PROC_FLAT, commission_pct: COMM_PCT }).eq('key', KEY);
   renderAnalytics(); renderBreaks();
 };
 
@@ -298,7 +306,9 @@ function renderAnalytics() {
   const start = rangeStart(); const rows = daily.filter(r => r.day >= start);
   const gross = rows.reduce((a, r) => a + Number(r.gross || 0), 0);
   const sales = rows.reduce((a, r) => a + Number(r.sales || 0), 0);
-  const net = gross * (1 - FEE / 100), avg = sales ? gross / sales : 0;
+  const processing = gross * (PROC_PCT/100) + PROC_FLAT * sales;
+  const commission = gross * (COMM_PCT/100);
+  const net = gross - processing - commission, avg = sales ? gross / sales : 0;
   $('#kpis').innerHTML = `
     <div class="kpi"><div class="l">Gross sales</div><div class="v">${fmt(gross)}</div></div>
     <div class="kpi"><div class="l">Net after fees</div><div class="v">${fmt(net)}</div></div>
@@ -308,7 +318,8 @@ function renderAnalytics() {
   const profit = net - cogs, roi = cogs > 0 ? profit / cogs * 100 : 0;
   $('#fin').innerHTML = `
     <div class="fb"><div class="l">Gross</div><div class="v">${fmt(gross)}</div></div>
-    <div class="fb"><div class="l">− fees (${FEE}%)</div><div class="v neg">−${fmt(gross - net)}</div></div>
+    <div class="fb"><div class="l">− Processing (${PROC_PCT}% + $${PROC_FLAT.toFixed(2)}×${sales})</div><div class="v neg">−${fmt(processing)}</div></div>
+    <div class="fb"><div class="l">− Commission (${COMM_PCT}%)</div><div class="v neg">−${fmt(commission)}</div></div>
     <div class="fb"><div class="l">Net after fees</div><div class="v">${fmt(net)}</div></div>
     <div class="fb"><div class="l">− Your cost</div><div class="v">${fmt(cogs)}</div></div>
     <div class="fb acc"><div class="l">Net profit</div><div class="v ${profit>=0?'pos':'neg'}">${fmt(profit)}</div></div>
@@ -335,7 +346,7 @@ function renderBreaks() {
   const startIdx = breakPage * breakPageSize, slice = breaks.slice(startIdx, startIdx + breakPageSize);
   $('#breaks').innerHTML = slice.map((b, j) => {
     const i = startIdx + j;
-    const gross = Number(b.gross || 0), net = gross * (1 - FEE / 100);
+    const gross = Number(b.gross || 0), net = gross - gross*(PROC_PCT+COMM_PCT)/100 - PROC_FLAT*Number(b.sales||0);
     const cost = b.cost === '' ? null : Number(b.cost);
     const profit = cost == null ? null : net - cost, roi = cost > 0 ? profit / cost * 100 : null;
     return `<tr><td class="muted">${b.started_at}</td><td><span class="pill muted">${b.sport || '—'}</span></td>
@@ -383,6 +394,25 @@ async function loadFeatures() {
   document.querySelectorAll('#features .upg[data-upg]').forEach(b => b.onclick = () => {
     const nav = document.querySelector('.nav[data-p="billing"]'); if (nav) nav.click();
   });
+  renderBeta();
+}
+const BETA = [
+  { ic:'🎡', name:'Custom Randomizer / Wheel', status:'beta', desc:'On-stream spinner to pick teams, giveaway winners, or break order.' },
+  { ic:'🏆', name:'Top-Buyer Leaderboard', status:'soon', desc:'Live top buyers shown right on your overlay.' },
+  { ic:'💥', name:'Big-Hit Alert', status:'soon', desc:'Animated alert when a chase / numbered / 1-of-1 is pulled.' },
+];
+function renderBeta(){
+  const host = $('#betaFeatures'); if(!host) return;
+  host.innerHTML = BETA.map(f => {
+    const pill = f.status==='beta' ? '<span class="pill green">Beta</span>' : '<span class="pill muted">Coming soon</span>';
+    const btn = f.status==='beta' ? 'Join beta' : 'Notify me';
+    return `<div class="feat"><div class="ic">${f.ic}</div><div style="flex:1"><b>${f.name}</b> ${pill}<div class="mini">${f.desc}</div></div><button class="btn ghost beta-btn" data-beta="${f.name}" style="padding:6px 12px">${btn}</button></div>`;
+  }).join('');
+  host.querySelectorAll('.beta-btn[data-beta]').forEach(b => b.onclick = () => betaInterest(b.dataset.beta));
+}
+async function betaInterest(name){
+  const { error } = await sb.from('support_tickets').insert({ bridge_key: KEY, source:'portal', subject:'Beta interest: '+name, summary:'Requested early access from the portal.' });
+  alert(error ? 'Could not send — please try again.' : "You're on the list for "+name+" — we'll reach out.");
 }
 const PAY_LINKS = {
   pro:             'https://buy.stripe.com/7sYeVfgeX288cR23jFdnW00',
@@ -430,9 +460,9 @@ async function loadBilling() {
   const fbtn = $('#founding'); if (fbtn) fbtn.onclick = () => goCheckout('founding');
   const fbtnA = $('#foundingA'); if (fbtnA) fbtnA.onclick = () => goCheckout('founding_annual');
   const plans = [
-    { id: 'local', name: 'Local', price: '$179', sub: 'one-time', feats: ['1 layout', 'Manual mark-sold', 'Email support'] },
-    { id: 'pro', name: 'Pro', price: '$349 build + $29/mo', sub: 'most popular', pay: 'pro', mo: '$29', payA: 'pro_annual', yr: '$290/yr', save: 'save $58', feats: ['Live automation', 'Up to 3 layouts', 'Scores ticker', 'Portal + analytics'] },
-    { id: 'elite', name: 'Elite', price: '$599 build + $49/mo', sub: 'high volume', pay: 'elite', mo: '$49', payA: 'elite_annual', yr: '$490/yr', save: 'save $98', feats: ['Everything in Pro', 'Up to 5 layouts', 'Priority queue & support', '2nd channel option'] },
+    { id: 'local', name: 'Local', price: 'No monthly', sub: 'self-hosted', feats: ['1 layout', 'Manual mark-sold', 'Email support'] },
+    { id: 'pro', name: 'Pro', price: '$29/mo', sub: 'most popular', pay: 'pro', mo: '$29', payA: 'pro_annual', yr: '$290/yr', save: 'save $58', feats: ['Live automation', 'Up to 3 layouts', 'Scores ticker', 'Portal + analytics'] },
+    { id: 'elite', name: 'Elite', price: '$49/mo', sub: 'high volume', pay: 'elite', mo: '$49', payA: 'elite_annual', yr: '$490/yr', save: 'save $98', feats: ['Everything in Pro', 'Up to 5 layouts', 'Priority queue & support', '2nd channel option'] },
   ];
   const cur = (b.tier || '').toLowerCase();
   $('#plans').innerHTML = '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px">' + plans.map(p => `
