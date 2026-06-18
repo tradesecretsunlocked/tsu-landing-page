@@ -131,9 +131,13 @@
           <div class="fin" id="fin"></div>
         </div>
         <div class="card">
-          <div class="row-between" style="margin:0 0 8px"><h3 style="margin:0">Breaks — profit by break</h3>
-            <div class="mini">Show <select id="pageSize" class="ci" style="width:70px"><option>10</option><option>25</option><option>50</option><option value="9999">All</option></select></div></div>
-          <table><thead><tr><th>Started</th><th>Sport</th><th style="text-align:right">Sales</th><th style="text-align:right">Gross</th><th style="text-align:right">Your cost</th><th style="text-align:right">Profit</th><th style="text-align:right">ROI</th></tr></thead>
+          <div class="row-between" style="margin:0 0 10px;flex-wrap:wrap;gap:8px"><h3 style="margin:0">Profit</h3>
+            <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+              <span class="mini" id="pageSizeWrap">Show <select id="pageSize" class="ci" style="width:64px"><option>10</option><option>25</option><option>50</option><option value="9999">All</option></select></span>
+              <div class="tf" id="groupBy"><button class="active" data-g="break">Break</button><button data-g="show">Show</button><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
+            </div></div>
+          <div id="profitChart" style="display:none;margin:0 0 12px"></div>
+          <table><thead id="profitHead"><tr><th>Started</th><th>Sport</th><th style="text-align:right">Sales</th><th style="text-align:right">Gross</th><th style="text-align:right">Your cost</th><th style="text-align:right">Profit</th><th style="text-align:right">ROI</th></tr></thead>
           <tbody id="breaks"></tbody></table>
           <div class="row-between" id="breaksPager" style="margin:10px 0 0"></div>
         </div>
@@ -270,7 +274,7 @@ document.querySelectorAll('.nav').forEach(n => n.onclick = () => {
 });
 document.querySelectorAll('#tf button').forEach(b => b.onclick = () => {
   document.querySelectorAll('#tf button').forEach(x => x.classList.remove('active')); b.classList.add('active');
-  TF = +b.dataset.d; renderAnalytics(); loadBuyers();
+  TF = +b.dataset.d; renderAnalytics(); loadBuyers(); renderProfit();
 });
 
 async function loadHeader() {
@@ -332,13 +336,13 @@ async function loadBuyers() {
   const max = top[0] ? top[0][1] : 1;
   $('#buyers').innerHTML = top.map(([b, v]) => `<div style="display:flex;align-items:center;gap:10px;margin:9px 0"><div class="muted" style="width:130px;font-size:12px">${b}</div><div style="flex:1;height:9px;background:var(--bg3);border-radius:6px;overflow:hidden"><div style="height:100%;width:${(v/max*100).toFixed(0)}%;background:linear-gradient(90deg,var(--navy-light),var(--gold))"></div></div><div style="width:70px;text-align:right;font-weight:600">${fmt(v)}</div></div>`).join('') || '<div class="mini">No sales in this range.</div>';
 }
-let breakPage = 0, breakPageSize = 10;
+let breakPage = 0, breakPageSize = 10, groupBy = 'break';
 async function loadBreaks() {
   const { data } = await sb.from('v_break_pnl').select('*').eq('bridge_key', KEY).order('started_at', { ascending: false }).limit(500);
   breaks = (data || []).map(b => ({ ...b, started_at: (b.started_at || '').slice(0, 10), cost: b.cost == null ? '' : Number(b.cost) }));
   breakPage = 0;
   const ps = $('#pageSize'); if (ps) ps.onchange = e => { breakPageSize = +e.target.value; breakPage = 0; renderBreaks(); };
-  renderBreaks();
+  renderProfit();
 }
 function renderBreaks() {
   const total = breaks.length, pages = Math.max(1, Math.ceil(total / breakPageSize));
@@ -368,6 +372,66 @@ function renderBreaks() {
     renderBreaks(); renderAnalytics();
   });
 }
+function netOf(gross, sales){ return gross - gross*(PROC_PCT+COMM_PCT)/100 - PROC_FLAT*Number(sales||0); }
+const MON=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtDay(d){ const p=d.split('-'); return MON[(+p[1])-1]+' '+(+p[2]); }
+function fmtMonth(ym){ const p=ym.split('-'); return MON[(+p[1])-1]+' '+p[0]; }
+function weekStart(d){ const dt=new Date(d+'T00:00:00'); const day=(dt.getDay()+6)%7; dt.setDate(dt.getDate()-day); return dt.toISOString().slice(0,10); }
+function groupKeyOf(b,g){
+  const d=b.started_at;
+  if(g==='show'){ const sid=b.stream_id||d; return {key:sid,label:fmtDay(d)+' \u00b7 '+String(sid).slice(0,6),sortKey:d+'~'+sid}; }
+  if(g==='day')  return {key:d,label:fmtDay(d),sortKey:d};
+  if(g==='week'){ const w=weekStart(d); return {key:w,label:'Wk of '+fmtDay(w),sortKey:w}; }
+  const m=d.slice(0,7); return {key:m,label:fmtMonth(m),sortKey:m};
+}
+function renderProfit(){
+  const ps=document.getElementById('pageSizeWrap'),chart=document.getElementById('profitChart'),head=document.getElementById('profitHead');
+  if(!head) return;
+  if(groupBy==='break'){
+    if(ps)ps.style.display=''; if(chart)chart.style.display='none';
+    head.innerHTML='<tr><th>Started</th><th>Sport</th><th style="text-align:right">Sales</th><th style="text-align:right">Gross</th><th style="text-align:right">Your cost</th><th style="text-align:right">Profit</th><th style="text-align:right">ROI</th></tr>';
+    renderBreaks(); return;
+  }
+  if(ps)ps.style.display='none';
+  const L={show:'Show',day:'Day',week:'Week',month:'Month'}[groupBy];
+  head.innerHTML='<tr><th>'+L+'</th><th style="text-align:right">Breaks</th><th style="text-align:right">Sales</th><th style="text-align:right">Gross</th><th style="text-align:right">Cost</th><th style="text-align:right">Profit</th><th style="text-align:right">ROI</th></tr>';
+  renderGrouped(groupBy,L);
+}
+function renderGrouped(g,L){
+  const start=rangeStart(), groups=new Map();
+  breaks.filter(b=>b.started_at>=start).forEach(b=>{
+    const k=groupKeyOf(b,g); let o=groups.get(k.key);
+    if(!o){o={label:k.label,sortKey:k.sortKey,gross:0,sales:0,cost:0,count:0};groups.set(k.key,o);}
+    o.gross+=Number(b.gross||0); o.sales+=Number(b.sales||0);
+    if(b.cost!==''&&b.cost!=null) o.cost+=Number(b.cost||0); o.count++;
+  });
+  const arr=[...groups.values()].sort((a,b)=> a.sortKey<b.sortKey?1:a.sortKey>b.sortKey?-1:0);
+  $('#breaks').innerHTML = arr.map(o=>{
+    const net=netOf(o.gross,o.sales),profit=net-o.cost,roi=o.cost>0?profit/o.cost*100:null;
+    return '<tr><td class="muted">'+o.label+'</td><td style="text-align:right">'+o.count+'</td>'+
+      '<td style="text-align:right">'+o.sales+'</td><td style="text-align:right">'+fmt(o.gross)+'</td>'+
+      '<td style="text-align:right">'+(o.cost?fmt(o.cost):'\u2014')+'</td>'+
+      '<td style="text-align:right;font-weight:600;color:'+(profit>=0?'var(--green)':'var(--red)')+'">'+fmt(profit)+'</td>'+
+      '<td style="text-align:right">'+(roi==null?'<span class="mini">\u2014</span>':'<span class="pill '+(roi>=0?'green':'red')+'">'+(roi>=0?'+':'')+roi.toFixed(0)+'%</span>')+'</td></tr>';
+  }).join('') || '<tr><td colspan="7" class="mini" style="padding:14px">No data in this range.</td></tr>';
+  $('#breaksPager').innerHTML='<span class="mini">'+arr.length+' '+g+(arr.length===1?'':'s')+' \u00b7 '+L+' view</span><span></span>';
+  const chart=document.getElementById('profitChart');
+  if(chart){ if(g==='day'||g==='week'||g==='month'){ chart.style.display=''; chart.innerHTML=profitChartSVG(arr.slice().reverse().map(o=>({label:o.label,value:netOf(o.gross,o.sales)-o.cost})),L); } else chart.style.display='none'; }
+}
+function profitChartSVG(series,gLabel){
+  if(!series.length) return '<div class="mini">No data to chart.</div>';
+  const W=660,H=180,padL=46,padB=24,padT=12,padR=8;
+  const vals=series.map(s=>s.value),max=Math.max(0,...vals),min=Math.min(0,...vals),range=(max-min)||1;
+  const plotH=H-padB-padT,plotW=W-padL-padR,n=series.length,step=plotW/n,bw=Math.max(3,Math.min(46,step*0.7)),y0=padT+(max/range)*plotH;
+  const bars=series.map((s,i)=>{const x=padL+i*step+(step-bw)/2,h=Math.abs(s.value)/range*plotH,y=s.value>=0?y0-h:y0;return '<rect x="'+x.toFixed(1)+'" y="'+y.toFixed(1)+'" width="'+bw.toFixed(1)+'" height="'+Math.max(1,h).toFixed(1)+'" fill="'+(s.value>=0?'var(--green)':'var(--red)')+'" rx="2"><title>'+s.label+': '+fmt(s.value)+'</title></rect>';}).join('');
+  const everyN=Math.ceil(n/8);
+  const xl=series.map((s,i)=> i%everyN===0?'<text x="'+(padL+i*step+step/2).toFixed(1)+'" y="'+(H-7)+'" font-size="9" fill="var(--muted)" text-anchor="middle">'+s.label.replace('Wk of ','')+'</text>':'').join('');
+  return '<div class="mini" style="margin-bottom:4px">Net profit by '+gLabel.toLowerCase()+'</div><svg viewBox="0 0 '+W+' '+H+'" width="100%" style="max-width:100%;display:block"><line x1="'+padL+'" y1="'+y0.toFixed(1)+'" x2="'+(W-padR)+'" y2="'+y0.toFixed(1)+'" stroke="rgba(255,255,255,.18)"/>'+bars+xl+'</svg>';
+}
+document.querySelectorAll('#groupBy button').forEach(b => b.onclick = () => {
+  document.querySelectorAll('#groupBy button').forEach(x=>x.classList.remove('active')); b.classList.add('active');
+  groupBy=b.dataset.g; renderProfit();
+});
 async function loadFeatures() {
   const [{ data: cat }, { data: cs }] = await Promise.all([
     sb.from('service_catalog').select('*').order('sort_order'),
