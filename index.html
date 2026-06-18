@@ -784,6 +784,8 @@
         <li><a href="#portfolio">Layouts &amp; Demos</a></li>
         <li><a href="#how-it-works">How It Works</a></li>
         <li><a href="#packages">Packages</a></li>
+        <li><a href="#addons">Add-Ons</a></li>
+        <li><a href="plans.html">Plans</a></li>
         <li><a href="#testimonials">Reviews</a></li>
         <li><a href="#faq">FAQ</a></li>
       </ul>
@@ -1038,6 +1040,41 @@
     <p style="text-align:center; margin-top:36px; font-size:14px; color:var(--muted)">
       Not sure which package fits? <a href="#" id="open-chat-link" style="color:var(--gold); text-decoration:underline">Chat with our assistant &rarr;</a>
     </p>
+  </div>
+</section>
+
+<!-- ===== ADD-ONS ===== -->
+<section id="addons">
+  <style>
+    #addons .addon-grid{ display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:16px; margin-top:8px; }
+    #addons .addon-card{ background:rgba(255,255,255,.02); border:1px solid var(--line,rgba(254,222,38,.16)); border-radius:12px; padding:18px 18px 16px; display:flex; flex-direction:column; gap:6px; }
+    #addons .addon-card .ao-top{ display:flex; justify-content:space-between; align-items:baseline; gap:10px; }
+    #addons .addon-card .ao-name{ font-weight:700; color:#fff; font-size:15px; }
+    #addons .addon-card .ao-price{ font-weight:800; color:var(--gold); white-space:nowrap; font-size:15px; }
+    #addons .addon-card .ao-desc{ color:var(--muted); font-size:13px; line-height:1.5; }
+    #addons .addon-note{ text-align:center; margin-top:26px; font-size:13.5px; color:var(--muted); }
+  </style>
+  <div class="container">
+    <div class="section-header fade-up">
+      <p class="section-label">À La Carte</p>
+      <h2 class="section-title">Add-Ons &amp; Extras</h2>
+      <p class="section-sub">Mix and match to fit your stream. Active subscribers save: <strong>Pro 10% off</strong>, <strong>Elite 20% off</strong> one-time add-ons.</p>
+    </div>
+    <div class="addon-grid fade-up">
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Extra Overlay Layout</span><span class="ao-price">$75</span></div><div class="ao-desc">Another sport or break format added to your overlay.</div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Stream Graphic Bundle</span><span class="ao-price">$35</span></div><div class="ao-desc">2–3 branded graphics (e.g. See 2 Pick 1, PYT).</div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Graphic Bundle + Animation</span><span class="ao-price">$50</span></div><div class="ao-desc">Branded graphics with light motion (Stash-or-Pass style).</div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Custom Animation / FX</span><span class="ao-price">from $65</span></div><div class="ao-desc">Branded effect or sequence. Elaborate builds quoted separately.</div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">OBS Scene Screens</span><span class="ao-price">from $99</span></div><div class="ao-desc">Starting Soon / BRB / Ending screens to match your overlay.</div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Stream Deck Setup</span><span class="ao-price">$79</span></div><div class="ao-desc">Full done-for-you button layout for your stream.</div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Custom Randomizer / Wheel</span><span class="ao-price">from $99</span></div><div class="ao-desc">On-overlay spin for team or spot assignment. <em>Included on Elite.</em></div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Draft Board Widget</span><span class="ao-price">$99</span></div><div class="ao-desc">Live draft-pick board with a running buyer list.</div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Chat Bot</span><span class="ao-price">$15/mo</span></div><div class="ao-desc">Auto-replies, giveaway calls, buyer engagement. <em>Free on Elite.</em></div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Rush Delivery</span><span class="ao-price">$99</span></div><div class="ao-desc">Skip the queue — move to the front of the build line.</div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Second-Channel Overlay</span><span class="ao-price">$19/mo</span></div><div class="ao-desc">Run a second channel. <em>Included on Elite.</em></div></div>
+      <div class="addon-card"><div class="ao-top"><span class="ao-name">Extra Revision Round</span><span class="ao-price">$50</span></div><div class="ao-desc">Additional round of design changes after delivery.</div></div>
+    </div>
+    <p class="addon-note">On a plan already? Your subscriber discount is applied automatically. See <a href="plans.html" style="color:var(--gold); text-decoration:underline">Plans &rarr;</a></p>
   </div>
 </section>
 
@@ -1528,8 +1565,10 @@
   const quickR    = document.getElementById("quick-replies");
 
   const RESPONSES = [
+    { p: /subscription|monthly|\/mo|per month|recurring|plan(s)?\b|keep.*(live|alive)|maintenance|hosting fee|ongoing|founding|pro plan|elite/i,
+      r: "TSU has two parts: a **one-time build**, then a low **monthly plan** that keeps a hosted/automated overlay live, maintained, and supported as Whatnot/OBS change. Plans: **Pro $29/mo** and **Elite $49/mo** (Elite adds the Chat Bot, randomizer/wheel & top-buyer leaderboard). Self-hosted Launch Bundle builds need no plan. Full details on our **Plans** page." },
     { p: /price|cost|how much|\$|188|398|650|expensive|cheap|afford|payment/i,
-      r: "Packages: **Launch Bundle - $188**, **Ultimate Edition - $398**, and **Custom builds from $650**. All one-time payments - no subscription. Each tier is a custom build made for your brand." },
+      r: "Builds are **one-time**: **Launch Bundle $188**, **Ultimate Edition $398**, **Custom from $650** - each custom-made for your brand. Hosted + automated overlays then run on a **monthly plan** from **$29/mo** that keeps them live and maintained; the self-hosted Launch Bundle needs no plan. See the **Plans** page for details." },
     { p: /which|recommend|right for me|best (package|tier|fit|option)|should i|not sure/i,
       r: "Quick guide: 👉 **Launch Bundle ($188)** - get on stream fast with a clean branded overlay and a guided setup call; you mark teams sold yourself. 👉 **Ultimate Edition ($398)** - the full package: multiple layouts, live Whatnot automation, web hosting, and 2 setup sessions. 👉 **Custom ($650+)** - bespoke builds with integrations and automations. Tell me how you stream and I'll point you to one!" },
     { p: /extension|chrome|plugin/i,

@@ -71,7 +71,20 @@
   .chips{display:flex;gap:8px;flex-wrap:wrap;padding:12px;border-top:1px solid var(--border);background:var(--bg2)}
   .chip{background:var(--bg3);border:1px solid var(--border);color:var(--text);padding:7px 12px;border-radius:18px;font-size:12px}.chip:hover{border-color:var(--border-gold)}.chip:disabled{opacity:.45;cursor:default}.btn{background:var(--navy);color:#fff;padding:9px 14px;border-radius:8px;font-weight:600;font-size:13px;border:1px solid var(--border-gold)}.btn:hover{background:var(--navy-light)}.btn.gold{background:var(--gold);color:#0a0a0a;border:none}.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--border)}
   .err{color:var(--red);font-size:13px;padding:10px}
-  @media(max-width:840px){.kpis{grid-template-columns:1fr 1fr}.sidebar{display:none}}
+  .section-title{font-size:13px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin:24px 0 12px;font-weight:600}
+  .grid-2{display:grid;grid-template-columns:1.6fr 1fr;gap:14px}.grid-2.even{grid-template-columns:1fr 1fr}
+  .client-chip{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:10px;margin:0 0 10px}
+  .client-chip .avatar{width:30px;height:30px;border-radius:8px;background:var(--navy-light);display:grid;place-items:center;font-weight:700;color:#fff;flex-shrink:0}
+  .client-chip b{font-size:13px}.client-chip span{display:block;color:var(--muted);font-size:11px}
+  .plan-card{background:linear-gradient(135deg,rgba(13,30,110,.55),rgba(212,175,55,.10));border:1px solid var(--border-gold);border-radius:12px;padding:14px;margin-bottom:8px}
+  .plan-card .tag{font-size:10px;letter-spacing:1.5px;color:var(--gold);font-weight:700}.plan-card b{display:block;margin:3px 0 0;font-size:13px}
+  .help-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  .help-card{background:var(--bg2);border:1px solid var(--border);border-radius:12px;padding:16px;transition:.15s;cursor:pointer}
+  .help-card:hover{border-color:var(--border-gold);transform:translateY(-2px)}
+  .help-card .ic{font-size:20px;margin-bottom:8px}.help-card b{display:block;margin-bottom:4px}.help-card p{color:var(--muted);font-size:12px}
+  .dot.live{animation:pulse 1.8s infinite}@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+  .up-btn{background:rgba(212,175,55,.14);color:var(--gold2);border:1px solid var(--border-gold);padding:7px 12px;border-radius:8px;font-size:12px;font-weight:600}
+  @media(max-width:840px){.kpis{grid-template-columns:1fr 1fr}.sidebar{display:none}.grid-2,.grid-2.even,.help-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -95,12 +108,14 @@
 <div id="app" class="hidden">
   <aside class="sidebar">
     <div class="brand" style="justify-content:center;padding-bottom:14px"><img src="assets/tsu-lab-logo.png" alt="TSU LAB Stream OS" style="width:165px;mix-blend-mode:screen"></div>
+    <div class="client-chip" id="sideClient" style="display:none"><div class="avatar" id="sideAvatar">·</div><div><b id="sideName"></b><span id="sidePlan"></span></div></div>
     <a class="nav active" data-p="analytics">📊 Breaks &amp; Analytics</a>
     <a class="nav" data-p="overlay">🎛️ Overlay &amp; Features</a>
     <a class="nav" data-p="billing">💳 Billing</a>
     <a class="nav" data-p="orders">📦 Orders</a>
     <a class="nav" data-p="help">💬 Help &amp; Support</a>
     <div class="spacer"></div>
+    <div class="plan-card" id="sidePlanCard" style="display:none"><span class="tag">YOUR PLAN</span><b id="sidePlanName">—</b></div>
     <button class="signout" id="setPwBtn">Set password</button>
     <button class="signout" id="signout">Sign out</button>
   </aside>
@@ -122,19 +137,21 @@
       <div id="adminOverview" class="hidden"></div>
       <div class="page active" id="analytics">
         <div class="row-between">
-          <div class="muted" style="font-size:13px" id="clientName">Loading…</div>
+          <div class="section-title" style="margin:0">Performance <span class="muted" id="clientName" style="font-size:12px;text-transform:none;letter-spacing:0;font-weight:500">Loading…</span></div>
           <div class="tf" id="tf"><button data-d="7">7d</button><button class="active" data-d="30">30d</button><button data-d="90">90d</button><button data-d="3650">All</button></div>
         </div>
         <div class="kpis" id="kpis"></div>
+        <div class="section-title">Profit &amp; ROI</div>
         <div class="card">
           <div class="row-between" style="margin:0">
-            <h3 style="margin:0">Profit &amp; ROI</h3>
+            <div><h3 style="margin:0">What this period made you</h3><div class="mini">Enter your cost per break below — we handle the fees and the math.</div></div>
             <div class="mini" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">Processing <input class="ci" id="procPct" type="number" step="0.1" style="width:54px">% + $<input class="ci" id="procFlat" type="number" step="0.01" style="width:56px">/txn &middot; Commission <input class="ci" id="commPct" type="number" step="0.5" style="width:54px">% <button class="chip" id="saveFee">Save</button></div>
           </div>
           <div class="fin" id="fin"></div>
         </div>
+        <div class="section-title">Breaks &mdash; profit by break</div>
         <div class="card">
-          <div class="row-between" style="margin:0 0 10px;flex-wrap:wrap;gap:8px"><h3 style="margin:0">Profit</h3>
+          <div class="row-between" style="margin:0 0 10px;flex-wrap:wrap;gap:8px"><h3 style="margin:0">Per break &amp; grouped</h3>
             <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">
               <span class="mini" id="pageSizeWrap">Show <select id="pageSize" class="ci" style="width:64px"><option>10</option><option>25</option><option>50</option><option value="9999">All</option></select></span>
               <div class="tf" id="groupBy"><button class="active" data-g="break">Break</button><button data-g="show">Show</button><button data-g="day">Day</button><button data-g="week">Week</button><button data-g="month">Month</button></div>
@@ -144,13 +161,20 @@
           <tbody id="breaks"></tbody></table>
           <div class="row-between" id="breaksPager" style="margin:10px 0 0"></div>
         </div>
-        <div class="card"><h3>Top buyers</h3><div id="buyers"></div></div>
+        <div class="section-title">Top buyers</div>
+        <div class="card" style="margin-top:0"><div id="buyers"></div></div>
       </div>
 
       <div class="page" id="overlay">
-        <div class="card"><h3>Features</h3><div class="mini" style="margin-bottom:6px">Features you can switch yourself show a toggle. Features included in your plan show <b>Included</b>. Anything not on your plan shows <b>Upgrade</b> — tap it to see plan options.</div><div id="features"></div></div>
-        <div class="card"><h3>🧪 In the works &amp; beta</h3><div class="mini" style="margin-bottom:6px">Upcoming and in-testing features. Want early access? Tap below and we&rsquo;ll reach out.</div><div id="betaFeatures"></div></div>
-        <div class="card"><h3>Overlay connection</h3><div id="conn"></div></div>
+        <div class="grid-2 even">
+          <div>
+            <div class="card" style="margin-top:0"><h3>Features</h3><div class="mini" style="margin-bottom:6px">Features you can switch yourself show a toggle. Features included in your plan show <b>Included</b>. Anything not on your plan shows <b>Upgrade</b> — tap it to see plan options.</div><div id="features"></div></div>
+            <div class="card"><h3>🧪 In the works &amp; beta</h3><div class="mini" style="margin-bottom:6px">Upcoming and in-testing features. Want early access? Tap below and we&rsquo;ll reach out.</div><div id="betaFeatures"></div></div>
+          </div>
+          <div>
+            <div class="card" style="margin-top:0"><h3>Overlay connection</h3><div id="conn"></div></div>
+          </div>
+        </div>
       </div>
 
       <div class="page" id="billing">
@@ -168,10 +192,21 @@
       </div>
 
       <div class="page" id="help">
-        <div class="bot">
-          <div class="bh"><div class="av">T</div><div><b>TSU Assist</b><div class="mini">Health checks · troubleshooting · tickets</div></div></div>
-          <div class="bb" id="bb"></div>
-          <div class="chips" id="chips"></div>
+        <div class="grid-2 even">
+          <div class="bot">
+            <div class="bh"><div class="av">T</div><div><b>TSU Assist</b><div class="mini">Health checks · troubleshooting · tickets</div></div></div>
+            <div class="bb" id="bb"></div>
+            <div class="chips" id="chips"></div>
+          </div>
+          <div>
+            <div class="card" style="display:flex;align-items:center;gap:14px;margin-top:0"><span class="dot live"></span><div><b>All systems operational</b><div class="mini">Bridge, overlays &amp; scores feed healthy.</div></div></div>
+            <div class="help-grid" style="margin-top:14px">
+              <div class="help-card" data-bot="diagnose" data-q="How do I start in OBS?" data-s="getting started in OBS"><div class="ic">🚀</div><b>Start in OBS</b><p>Add your overlay and go live.</p></div>
+              <div class="help-card" data-bot="diagnose" data-q="Fix a sold misfire" data-s="wrong team marked sold"><div class="ic">🎯</div><b>Marking sold</b><p>Fix a misfire fast.</p></div>
+              <div class="help-card" data-bot="diagnose" data-q="Turn on live scores" data-s="scores not showing"><div class="ic">🏈</div><b>Live scores</b><p>Turn on the ticker.</p></div>
+              <div class="help-card" data-bot="diagnose" data-q="I want to open a support ticket" data-s="open a support ticket"><div class="ic">💬</div><b>Open a ticket</b><p>We'll pre-fill your details.</p></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -288,6 +323,7 @@ async function loadHeader() {
   const { data } = await sb.from('v_overlay_health').select('*').eq('key', KEY).maybeSingle();
   const h = data || {}; const s = h.health_status || 'idle';
   $('#clientName').textContent = h.client_name || '';
+  { const nm = h.client_name || ''; const sc = $('#sideClient'); if (sc && nm) { $('#sideName').textContent = nm; $('#sideAvatar').textContent = nm.charAt(0).toUpperCase(); sc.style.display = 'flex'; } }
   $('#strip').innerHTML = `<span><span class="dot ${s}"></span>${({live:'Connected',idle:'Idle',stale:'Inactive',revoked:'Inactive',never_connected:'Not connected'})[s]||s}</span>`;
   $('#conn').innerHTML = `<div style="display:flex;align-items:center;gap:10px"><span class="dot ${s}"></span><b>${({live:'Connected',idle:'Idle',stale:'Inactive',revoked:'Inactive',never_connected:'Not connected'})[s]||s}</b><span class="mini">${h.seconds_since_last_event!=null?'· last event '+h.seconds_since_last_event+'s ago':''}</span></div><div class="mini" style="margin-top:8px">Your OBS overlay URL is in your welcome email. Need it resent? Ask TSU Assist.</div>`;
 }
@@ -518,6 +554,9 @@ async function loadBilling() {
   const { data } = await sb.from('client_billing').select('*').eq('key', KEY).maybeSingle();
   const b = data || {};
   const grand = b.grandfathered, status = b.subscription_status || 'none';
+  { const planLabel = grand ? 'Founding Member' : (b.tier ? b.tier.charAt(0).toUpperCase() + b.tier.slice(1) : 'No plan');
+    const sp = $('#sidePlan'); if (sp) sp.textContent = planLabel;
+    const pc = $('#sidePlanCard'); if (pc) { $('#sidePlanName').textContent = grand ? 'Grandfathered · Free hosting' : (b.tier && status === 'active' ? planLabel + (b.monthly_amount ? ' · $' + b.monthly_amount + '/mo' : '') : 'No active plan'); pc.style.display = 'block'; } }
   const annual = !!(b.current_period_end && (new Date(b.current_period_end) - Date.now()) > 60*864e5);
   $('#bill').innerHTML = `<div style="display:flex;gap:30px;flex-wrap:wrap;align-items:flex-start">
       <div><div class="mini">Plan</div><b style="font-size:18px;text-transform:capitalize">${b.tier || '—'}</b></div>
@@ -531,8 +570,8 @@ async function loadBilling() {
   const fbtn = $('#founding'); if (fbtn) fbtn.onclick = () => goCheckout('founding');
   const fbtnA = $('#foundingA'); if (fbtnA) fbtnA.onclick = () => goCheckout('founding_annual');
   const plans = [
-    { id: 'pro', name: 'Pro', price: '$29/mo', sub: 'most popular', pay: 'pro', mo: '$29', payA: 'pro_annual', yr: '$290/yr', save: 'save $58', feats: ['Hosted + live automation', 'Client portal + profit analytics', 'Platform-change maintenance', 'Priority support · 1 tweak/mo', 'Scores + new self-serve tools', '10% off add-ons'] },
-    { id: 'elite', name: 'Elite', price: '$49/mo', sub: 'high volume', pay: 'elite', mo: '$49', payA: 'elite_annual', yr: '$490/yr', save: 'save $98', feats: ['Everything in Pro', 'Top-priority support · 3 tweaks/mo', 'ALL tools included (incl. Chat Bot)', '2nd channel + early access', '20% off add-ons'] },
+    { id: 'pro', name: 'Pro', price: '$29/mo', sub: 'most popular', pay: 'pro', mo: '$29', payA: 'pro_annual', yr: '$290/yr', save: 'save $58', feats: ['Live sale automation + hosting', 'Client portal + profit analytics', 'Live scores', 'Platform-change maintenance', 'Priority support · 1 tweak/mo', '10% off add-ons'] },
+    { id: 'elite', name: 'Elite', price: '$49/mo', sub: 'high volume', pay: 'elite', mo: '$49', payA: 'elite_annual', yr: '$490/yr', save: 'save $98', feats: ['Everything in Pro', 'Chat Bot included', 'Custom Randomizer / Wheel', 'Top-Buyer Leaderboard', 'Top-priority support · 3 tweaks/mo', '2nd channel + early access', '20% off add-ons'] },
   ];
   const cur = (b.tier || '').toLowerCase();
   $('#plans').innerHTML = '<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">' + plans.map(p => `
@@ -578,6 +617,9 @@ async function send(c) {
   const payload = c.a === 'diagnose' ? { action: 'diagnose', symptom: c.s } : { action: c.a, symptom: c.s || '', steps_tried: [] };
   const d = await call(payload); if (d) { bmsg(md(d.reply)); setChips(d.chips); }
 }
+document.querySelectorAll('.help-card[data-bot]').forEach(c => c.onclick = () => {
+  send({ t: c.getAttribute('data-q') || 'Help', a: c.dataset.bot, s: c.getAttribute('data-s') || '' });
+});
 </script>
 </body>
 </html>

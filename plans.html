@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Plans — Trade Secrets Unlocked</title>
+<meta name="description" content="A one-time build plus a low monthly plan that keeps your hosted, automated overlay live, maintained, and supported as Whatnot and OBS change." />
+<style>
+  :root{ --bg:#0b0b0c; --panel:#141414; --gold:#fede26; --gold2:#d4af37; --navy:#0d1e6e; --txt:#eee; --muted:#a9a9a9; --line:rgba(254,222,38,.18); --green:#16c784; }
+  *{ box-sizing:border-box; }
+  body{ margin:0; background:radial-gradient(1200px 600px at 50% -10%, rgba(13,30,110,.45), transparent), linear-gradient(180deg,#0b0b0c,#000); color:var(--txt);
+        font:16px/1.6 -apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif; min-height:100vh; }
+  a{ color:var(--gold); }
+  .wrap{ max-width:1000px; margin:0 auto; padding:30px 22px 80px; }
+  .topbar{ display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .topbar img{ height:46px; width:auto; }
+  .back{ font-size:13.5px; text-decoration:none; color:var(--muted); }
+  .back:hover{ color:var(--gold); }
+  .head{ text-align:center; margin:34px auto 8px; max-width:680px; }
+  .label{ text-transform:uppercase; letter-spacing:2px; font-size:12px; color:var(--gold); font-weight:700; }
+  h1{ font-size:30px; margin:8px 0 10px; color:#fff; }
+  .lead{ color:var(--muted); font-size:15.5px; }
+  .two-part{ display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin:26px 0 8px; }
+  .two-part .pill{ background:rgba(13,30,110,.30); border:1px solid var(--line); border-radius:12px; padding:12px 16px; font-size:14px; max-width:430px; }
+  .two-part .pill b{ color:#fff; }
+  .grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; margin:30px 0 6px; }
+  @media (max-width:720px){ .grid{ grid-template-columns:1fr; } }
+  .plan{ background:var(--panel); border:1px solid var(--line); border-radius:16px; padding:26px 24px; position:relative; }
+  .plan.featured{ border-color:var(--gold); box-shadow:0 0 0 1px var(--gold) inset, 0 14px 40px rgba(254,222,38,.08); }
+  .plan .badge{ position:absolute; top:-12px; right:18px; background:linear-gradient(180deg,var(--gold),var(--gold2)); color:#1a1400; font-weight:800; font-size:11px; letter-spacing:.4px; padding:5px 11px; border-radius:20px; }
+  .plan .pname{ font-size:13px; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); font-weight:700; }
+  .plan .price{ font-size:36px; font-weight:900; color:#fff; margin:8px 0 0; }
+  .plan .price sup{ font-size:18px; top:-.5em; }
+  .plan .price .per{ font-size:15px; color:var(--muted); font-weight:600; }
+  .plan .annual{ font-size:13px; color:var(--muted); margin:2px 0 14px; }
+  .plan ul{ list-style:none; padding:0; margin:14px 0 0; }
+  .plan li{ position:relative; padding:6px 0 6px 24px; font-size:14px; color:#dcdcdc; border-top:1px solid rgba(255,255,255,.05); }
+  .plan li:first-child{ border-top:0; }
+  .plan li::before{ content:"\2713"; position:absolute; left:0; top:6px; color:var(--green); font-weight:800; }
+  .plan li.head{ color:#fff; font-weight:600; }
+  .founding-note{ text-align:center; color:var(--muted); font-size:13.5px; margin:8px auto 0; max-width:660px; }
+  .covers{ background:rgba(255,255,255,.02); border:1px solid var(--line); border-radius:16px; padding:26px 24px; margin:34px 0 0; }
+  .covers h2{ font-size:14px; text-transform:uppercase; letter-spacing:1.5px; color:var(--gold); margin:0 0 14px; }
+  .covers-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:16px; }
+  @media (max-width:720px){ .covers-grid{ grid-template-columns:1fr; } }
+  .covers-grid .c b{ color:#fff; display:block; margin-bottom:3px; }
+  .covers-grid .c p{ margin:0; color:var(--muted); font-size:13.5px; }
+  .fineprint{ color:var(--muted); font-size:13px; margin-top:16px; }
+  .cta{ text-align:center; margin:36px 0 0; }
+  .btn{ display:inline-block; background:linear-gradient(180deg,var(--gold),var(--gold2)); color:#1a1400; font-weight:900; text-decoration:none; padding:14px 28px; border-radius:12px; letter-spacing:.3px; }
+  .btn.ghost{ background:transparent; color:var(--gold); border:1px solid var(--gold); margin-left:10px; }
+  .cta .sub{ color:var(--muted); font-size:12.5px; margin-top:12px; }
+  footer{ text-align:center; margin-top:42px; color:var(--muted); font-size:13px; }
+  footer a{ text-decoration:none; }
+  .dot{ color:var(--line); margin:0 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="topbar">
+    <a href="index.html"><img src="assets/tsu-lab-logo.png" alt="TSU LAB — Trade Secrets Unlocked" /></a>
+    <a class="back" href="index.html">&larr; Back to TSU</a>
+  </div>
+
+  <div class="head">
+    <div class="label">Plans</div>
+    <h1>Keep your overlay alive &amp; evolving</h1>
+    <p class="lead">Whatnot, OBS, and Chrome change constantly &mdash; and those changes can break a live overlay. Your plan is what keeps a hosted, automated overlay running, maintained, and supported, plus access to the client portal and new features.</p>
+  </div>
+
+  <div class="two-part">
+    <div class="pill">🛠️ <b>One-time build</b> &mdash; Launch Bundle $188, Ultimate Edition $398, or Custom from $650. Paid once on Stan.</div>
+    <div class="pill">🔄 <b>Monthly plan</b> &mdash; keeps a hosted/automated overlay live, maintained &amp; supported. A self-hosted Launch Bundle needs no plan.</div>
+  </div>
+
+  <div class="grid">
+
+    <div class="plan">
+      <div class="pname">Pro</div>
+      <div class="price"><sup>$</sup>29<span class="per">/mo</span></div>
+      <div class="annual">or $290/year &mdash; ~2 months free</div>
+      <ul>
+        <li class="head">Everything to keep you live</li>
+        <li>Live sale automation + overlay hosting</li>
+        <li>Client portal + profit &amp; ROI analytics</li>
+        <li>Live scores</li>
+        <li>Platform-change maintenance (Whatnot/OBS/Chrome breaks &rarr; we fix)</li>
+        <li>Priority support &middot; 1 minor tweak / month</li>
+        <li>10% off one-time add-ons</li>
+      </ul>
+    </div>
+
+    <div class="plan featured">
+      <span class="badge">★ Best Value</span>
+      <div class="pname">Elite</div>
+      <div class="price"><sup>$</sup>49<span class="per">/mo</span></div>
+      <div class="annual">or $490/year &mdash; ~2 months free</div>
+      <ul>
+        <li class="head">Everything in Pro, plus tools included</li>
+        <li><b>Chat Bot</b> included (auto-replies, giveaway calls)</li>
+        <li>Custom Randomizer / Wheel</li>
+        <li>Top-Buyer Leaderboard</li>
+        <li>Top-priority support &middot; 3 minor tweaks / month</li>
+        <li>Second channel + early access to new features</li>
+        <li>20% off one-time add-ons</li>
+      </ul>
+    </div>
+
+  </div>
+
+  <p class="founding-note">Pre-launch clients are <b>grandfathered &mdash; free hosting at no monthly cost</b>. Want the profit &amp; ROI analytics dashboard too? Founding members can add it for just <b>$12/mo</b> (a locked discount). New clients start on Pro or Elite above.</p>
+
+  <div class="covers">
+    <h2>What your plan covers</h2>
+    <div class="covers-grid">
+      <div class="c"><b>Platform changes</b><p>When a Whatnot, OBS, or Chrome update breaks your automation, fixing it is included &mdash; this is the core of the plan.</p></div>
+      <div class="c"><b>Hosting &amp; uptime</b><p>Your hosted overlay stays online and served, so your OBS browser source just works every stream.</p></div>
+      <div class="c"><b>Portal &amp; analytics</b><p>Track real profit &amp; ROI per break, manage your plan, and reach support &mdash; all in the client portal.</p></div>
+      <div class="c"><b>Support &amp; tweaks</b><p>Priority help by tier, plus included minor tweaks each month (1 on Pro, 3 on Elite). Bigger changes are quoted at a subscriber discount.</p></div>
+    </div>
+    <p class="fineprint">Client-side issues (your PC, internet, OBS config, Whatnot account, or modified files) are outside the plan &mdash; we'll still point you in the right direction. Full coverage details are in our <a href="policies.html">Client Policies</a>.</p>
+  </div>
+
+  <div class="cta">
+    <a class="btn" href="https://portal.tradesecretsunlocked.com" target="_blank" rel="noopener">Go to the Client Portal &rarr;</a>
+    <a class="btn ghost" href="index.html#addons">See add-ons</a>
+    <div class="sub">Manage or start your plan from inside the portal. Questions? Reach us at TSU@pokemastermates.com or in Discord.</div>
+  </div>
+
+  <footer>
+    <a href="index.html">Trade Secrets Unlocked</a>
+    <span class="dot">&middot;</span>
+    <a href="https://discord.gg/xcycn5s6DU" target="_blank" rel="noopener">Discord</a>
+    <span class="dot">&middot;</span>
+    <a href="policies.html">Client Policies</a>
+  </footer>
+
+</div>
+</body>
+</html>
