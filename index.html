@@ -66,7 +66,7 @@
 
     .btn {
       display: inline-flex; align-items: center; gap: 8px;
-      padding: 14px 28px; border-radius: 8px;
+      padding: 10px 12px; border-radius: 8px;
       font-size: 18px; font-weight: 700; letter-spacing: 0.02em;
       transition: all var(--transition); white-space: nowrap;
     }
@@ -124,7 +124,7 @@
     }
     .nav-inner {
       display: flex; align-items: center; justify-content: space-between;
-      height: 74px;
+      height: 100px;
     }
     .nav-logo {
       display: flex; align-items: center; gap: 10px;
@@ -148,10 +148,10 @@
     .nav-logo-text .tsu { color: var(--gold); }
     .nav-logo-text .rest { color: var(--text); }
     .nav-links {
-      display: flex; align-items: center; gap: 32px; list-style: none;
+      display: flex; align-items: center; gap: 22px; list-style: none;
     }
     .nav-links a {
-      font-size: 18.5px; font-weight: 700; color: var(--gold);
+      font-size: 17px; font-weight: 700; color: var(--gold);
       letter-spacing: 0.01em; transition: color var(--transition);
     }
     .nav-links a:hover { color: var(--gold2); }
@@ -192,7 +192,7 @@
     }
     .hero-cta { display: flex; gap: 16px; flex-wrap: wrap; align-items: center; }
     .hero-cta .btn-gold {
-      font-size: 16.5px; padding: 18px 36px;
+      font-size: 17.5px; padding: 11px 22px;
       animation: cta-pulse 2.8s ease-in-out infinite;
     }
     @keyframes cta-pulse {
@@ -393,7 +393,7 @@
     .mid-cta-title { font-size: 21px; font-weight: 800; line-height: 1.25; }
     .mid-cta-title em { font-style: normal; color: var(--gold); }
     .mid-cta-sub { font-size: 14px; color: var(--muted); margin-top: 5px; }
-    .mid-cta .btn { font-size: 15.5px; padding: 16px 32px; }
+    .mid-cta .btn { font-size: 17.5px; padding: 10px 8px; }
     @media (max-width: 560px) { .mid-cta { padding: 24px 22px; } }
 
     /* ===== HOW IT WORKS ===== */
@@ -494,7 +494,7 @@
     .pkg-features li.dim { color: var(--muted2); }
     .pkg-features li.dim::before { content: "–"; color: var(--muted2); }
     .pkg-cta { margin-top: 28px; }
-    .pkg-cta .btn { width: 100%; justify-content: center; font-size: 15px; padding: 16px; }
+    .pkg-cta .btn { width: 100%; justify-content: center; font-size: 16px; padding: 10px; font-weight: 800px; }
 
     /* Custom Build CTA */
     .custom-build-cta {
@@ -515,7 +515,7 @@
     .custom-build-actions { display: flex; gap: 12px; flex-wrap: wrap; }
 
     /* ===== TESTIMONIALS ===== */
-    #testimonials { padding: 100px 0; background: var(--bg0); }
+    #testimonials { padding: 50px 0; background: var(--bg0); }
 
     /* Video testimonials */
     .sub-section-label {
@@ -575,7 +575,7 @@
     }
     .t-card {
       background: var(--card); border: 1px solid var(--border);
-      border-radius: var(--radius-lg); padding: 32px;
+      border-radius: var(--radius-lg); padding: 10px;
       display: flex; flex-direction: column; gap: 16px;
       transition: border-color var(--transition);
     }
@@ -595,7 +595,8 @@
 
     /* ===== FAQ ===== */
     #faq { padding: 20px 0; background: var(--bg1); }
-    .faq-grid { max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; gap: 12px; }
+    .faq-grid { max-width: 720px; margin: 0 auto; display: grid;  gap: 12px; grid-template-columns:repeat(auto-fill, minmax(313px, 1fr)); }
+
     .faq-item {
       background: var(--card); border: 1px solid var(--border);
       border-radius: var(--radius); overflow: hidden; transition: border-color var(--transition);
@@ -614,7 +615,7 @@
 
     /* ===== CTA BAND ===== */
     #cta-band {
-      padding: 100px 0;
+      padding: 40px 0;
       background:
         radial-gradient(ellipse 800px 400px at 30% 50%, rgba(13,30,110,0.35), transparent 65%),
         radial-gradient(ellipse 600px 300px at 70% 50%, rgba(212,175,55,0.08), transparent 65%),
@@ -631,10 +632,10 @@
     .cta-band-contact a { color: var(--gold); }
 
     /* ===== FOOTER ===== */
-    footer { background: var(--bg1); border-top: 1px solid var(--border); padding: 64px 0 32px; }
+    footer { background: var(--bg1); border-top: 1px solid var(--border); padding: 35px 0 32px; }
     .footer-grid {
       display: grid; grid-template-columns: 2fr 1fr 1fr 1fr;
-      gap: 40px; margin-bottom: 48px;
+      gap: 40px; margin-bottom: 5px;
     }
     @media (max-width: 768px) { .footer-grid { grid-template-columns: 1fr 1fr; } }
     @media (max-width: 480px) { .footer-grid { grid-template-columns: 1fr; } }
